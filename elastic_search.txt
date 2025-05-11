@@ -1,0 +1,1259 @@
+Elastic Stack - The elastic stack is a group of open source products build by elastic.
+    1. Elastic search - A search engine based on Lucene. It provides a distributed, multitenant capable full-text search engine with an HTTP web interface and schema-free JSON documents.
+        1. X-pack - A commercial plugin that extends the capabilities of the Elastic Stack. It includes features such as security, alerting, monitoring, reporting, and graphing. Elasticsearch SQL (SQL Api - SQL query -> result, Translate Api - sql query -> query DSL (Domain Specific Language))
+        2. Elasticsearch - A distributed, RESTful search and analytics engine capable of solving a growing number of use cases. (Center is elastic search where all the data is stored and searched) We can put the data into elastic search via beats and logstash or even directly through elastic search Apis.
+        3. Kibana - A data visualization and exploration tool for Elasticsearch (dashboard).
+        4. Logstash - A server-side data processing pipeline that ingests data from multiple sources simultaneously, transforms it, and then sends it to your favorite “stash.”
+        5. Beats - Lightweight data shippers that send data from hundreds or thousands of machines to Logstash or Elasticsearch.
+    
+    Architecture of Elastic Stack
+        Node - A single instance of elastic search. It can be a master node, data node, or client node. (one computer can have multiple nodes)      
+        Cluster - A group of nodes that hold the same data and provide indexing and search capabilities across all nodes.
+        Index - A collection of documents that have similar characteristics. It is like a table in a relational database.
+        Document - A basic unit of information that can be indexed. It is like a row in a table of relational database. (inculdes metada + json) ({_index, _type, _id, ..., _source}) (document - rows, fields - columns, index - table)
+        Shard - A subset of an index. It is like a partition in a table of relational database.
+        Replica - A copy of a shard. It is used for high availability and fault tolerance.
+        Mapping - A way to define how a document, and the fields it contains, are stored and indexed.
+        Query DSL - A powerful and flexible way to query Elasticsearch. It is based on JSON and allows you to build complex queries using a simple syntax.
+        REST API - A set of APIs that allow you to interact with Elasticsearch using HTTP requests. It is used to perform CRUD operations on indices and documents.
+
+    Shardingg - Sharding is the process of dividing a large index into smaller pieces called shards. Each peace is called shard. Sharding is done at index level. It is used to improve performance and scalability.
+                    Student Index 700 GB                            Or We can also divide 100 GB index into 2 shards of 50
+                            |                                       GB and store it in same node for fast searching.
+                            |                                       As sharding improves performance by parallelization
+                   +--------+--------+                              of queries.
+                   |                 |  (350 GB each)               1 shard limit = 2 billion documents
+                   v                 v                              Split API = increase the number of shards
+            Node 1 (500 GB)     Node 2 (500 GB)                     Shrink API = decrease the number of shards
+                
+    Primary Shard - The primary shard is the main shard of an index. It is responsible for storing the data of an index.
+    Replica Shard - A copy of a primary shard. It is used for high availability and fault tolerance.
+
+    Replication  - Replication is the process of creating a copy of a primary shard. It is used for high availability and fault tolerance. Replication group is a group of primary shard and it's corresponding replica shards.
+
+    Role of Nodes: 
+        1. Master Node - The master node is responsible for managing the cluster. It is responsible for creating and deleting indices, adding and removing nodes from the cluster, tracking which nodes are the part of clustre , deciding which shartd to allocate to which node, and performing other cluster-level tasks. 
+            (node.master = true/false)
+        2. Data Node - The data node is responsible for storing the data of an index. It is responsible for performing indexing, searching, and other data-related tasks. In config file node.data is false then no shard will be saved which is used in case of master node.
+            (node.data = true/false)  
+        3. Ingest Node - (ingesting pipeline = indexing document) The ingest node is responsible for performing data ingestion tasks (manipulate documents before adding index to them, like remove some useless fields and adding some more information). It is responsible for performing data ingestion tasks such as parsing, filtering, and transforming data. It is just like a simplified version of logstash within elastic search. In case of file beat make it off.
+            (node.ingest = true/false)
+        4. Machine Learning Node - The machine learning node is responsible for performing machine learning tasks. It is responsible for performing machine learning tasks such as anomaly detection, forecasting, and clustering.
+            (node.ml = true/false (for jobs) and xpack.ml.enabled = true/false (for apis))
+        5. Coordinating Node - The coordinating node is responsible for coordinating the requests to the master node and data nodes. It is responsible for performing routing and other client-side tasks. route queries to ther nodes, load balancer, doesn't do anyrthing itself.
+            (node.ingest = true/false and xpack.ml.enabled = true/false (for apis) and node.data = true/false and node.master = true/false and node.ml = true/false (for jobs))
+        6. Voting only nodes - Participate to elect a new master node in case of master node failure.
+            (node.voting_only = true/false)
+              
+    Routing: 
+        The routing is the process of determining which shard a document should be stored in.
+        shard_number = hash(_routing) % number_of_primary_shards  ---> _routing is by default _id in document
+        Number of shards can not be changed once we insert a document.
+
+    How Elastic search reads data:
+        GET /_name/doc/12345 -> co-ordination node (work as a load balancer) -> data node -> routing -> replication group -> ARS (adaptive replica selection) (select the best replica which is free and where search is optimized/fast) -> replica -> document => goes to co-ordination again and return to client.
+    
+    How Elastic search writes data:
+    PUT /_name/doc/12345 -> co-ordination node (work as a load balancer) -> data node -> routing -> replication group -> select primary shard -> validate data -> write to primary shard -> write to replica shards -> return to co-ordination node -> return to client
+
+    Primary Term: How many time does primary shard is changed (elected).
+    Sequence Number: Counter for each write operation of replication group. This is updated by primary shard only.
+    Global checkpoint: checkpoint for replication group. Smallest sequence number out of replication group.
+    Local checkpoint: checkpoint for each Replica. Its basically counter for each write operation.
+    
+    Optimistic Concurrency Control:
+    If we want to update a document then we need to use optimistic concurrency control. If 2 clients fetch a document simultaneously and one is update it then other is going to update on old data. 
+    User A and User B both fetch the same document (version 1).
+    User A updates and saves (version becomes 2); now when User B tries to save based on old version 1, ElasticSearch throws version conflict error (optimistic control).
+    POST /name/_update/12345?if_primary_term=2&if_seq_no=27 ---> 
+    {
+        "doc": {
+            "age": 21,
+            "last_name": "Kumar"
+        }
+    }
+
+    Bulk Api: Bulk api is a feature that allows you to index or update multiple documents in a single api call. It is designed to be more effecient when dealing with large volumes of data, as it reduces the overhead of making individual requests for each document. You provide a sequence of action  and data pairs in a single HTTP requests, and elastic search processes them in a batch. The actions can be index, create, update or delete and  the dara contains the actual document to be indexed or updated.
+    index and create difference = index (create document if doc with same id and data exists then its get updated/replaced ), create (if doc with same id and data exists then it throws error)
+        Advantages: 
+            Reduced network overhead: By sending multiple actions in a single request, you save on the overhead of establishing separate connections for each individual action, which can be partially benificial when dealing with a large number of documents.
+            Improved indexing speed: The bulk api allows elastic search to optimize the indixing process by performing it in batches, which can significantly improve the indexing speed when compared to individual requests.
+    
+    Analyzer in elastic search:  (token = word = term)
+        Analysis refers to the process of converting text into terms that can be efficiently stred and searched. Elastic search uses a powerful text analysis engine to break down textual data into individual tokens or terms, which are then used to build an inverted index for fast and accurate full-text search engine.
+        Analyzer has 3 phases: 
+            character filter: Character filters are used to process the input text beforetokenization. They can perform tasks like removing HTML tags, replacing specific characters, etc. Bydefault there is no character filter.
+            tokenization: Standard tokenizer (split the text into words based on whitespace and punctuation) 
+            token filtering: Lowercase token ( Converts all token to lowercase)
+        We can make our custom analyzer.
+
+        POST _analyze
+        {
+            "text": "Helo, How are you? What's up? This is so high-end",
+            "analyzer": "standard"      ---> optional (by default it's standard) (standard, whitespace (split with whitespaces), stop (removes stop words 
+                                             such as are,  is, this))
+        }
+        POST _analyze
+        {
+            "text": "Helo, How are you? What's up? This is so high-end",
+            "char_filter": [],              ---+
+            "tokenizer": "standard",           | -> combination of these 3 called standard analyzer
+            "filter": ["lowercase"]         ---+
+        }
+
+    Inverted Index: An inverted index is a fundamental data structure used to effeciently store and retrieve information from a large collection of documents. Its is the backbone of elasticsearc's powerful and fast full-text search capabilities. The inverted index is designed to solve the problem of quickly finding all documents that contain a specific term or word in a vast collection of documents. Instead of scanning through each document one by one, which can be time consuming for large datasets, the inverted index allows elastic search to perform searches much more effeciently. For each token, the inverted index maintains a list of document IDs where the token appears. It creates a mapping between each token and the corresponding documents that contain that token. By leveraging the inverted index, elastic search dramatically reduces the time and resources required to perform complex searches over large sets of documents, making it powerful tool for building search applications and systems.
+        (
+            Inverted index : Maps terms to the documents they appear in. It is widely used in modern search engines like elastic search for efficient full-text 
+                             search  and retrival.
+            Forward Index : In contrast to inverted indexing, forward indexing is not a common term used in database systems. It refers to the 
+                            straightforward organization of documents or records  in a sequential manner. Each document or record is stored in a separate locatio, and the index (if any) simply points to the location of each document. It allows for direct retrival of document based on unique IDs or keys.
+                            Suppose You have a document management system that stores files, and each file is given a unique document ID. The file are stored as  individual documents with their content. The system maintains a forward index, which is a mapping of document IDs to the location where the files are stored on disk.
+                            example:
+                            Document ID: 1001, Location: /data/files/file_1001.txt
+                            Document ID: 1002, Location: /data/files/file_1002.txt
+        ) 
+
+    Doc Values: Numeric fields and keywords (like email, dates) are stored in a different way compared to text fields in elasticsearch.
+                Instead of using inverted index, elastic search uses a datastructure called "Doc Values" for numeric fields. This approach allows for efficient numerical range queries and aggregations. Helps in sorting, aggregations, etc.
+    
+    Mapping: Defines how documents and their fields are stored and indexed. It essentially describes the data structure of your documents, including data types of fields, how they should be analyzed. While Dynamic Mapping can be helpful for quickly getting started with elastic search and handling unknown fields, Explicit Mapping is essential for data control, consistency, and optimizing the search performance. It allows us to define the schema that best fits your data and ensure that elastic search behaves as expected, even as your data evolves over time.
+        Advantages: Preventing type conflicts, elastic search doesn't need to spend resources analyzing and guessing the data types for every new field, explicit mapping allow you to define validation rules and ensure data integrity during indexing.
+        In dynamioc mapping when es define a text field it is stored as text as well as do_value keyword up to 256 characters.
+
+        example: 
+        {
+            "name": "Bollywood Blockbuster",
+            "rating": 8.7,
+            "budget": 10000000,
+            "director":{
+                "name": "John Doe",
+                "email": "john.doe@example.com"
+            },
+            "description": "A captivating story of love, drama, and action set in heart of Mumbai.",
+            "actors": [
+                {
+                    "name": "Alice Smith",
+                    "age": 32
+                },
+                {
+                    "name": "Bob John",
+                    "age": 35
+                },
+                {
+                    "name": "Eve Lee",
+                    "age": 28
+                }
+            ]
+        }
+
+        Mapping: 
+
+        PUT /movies
+        {
+            "mappings": {
+                "dynamic" "strict", ---> to turn off dynamic mapping, strictly check for mapping otherwise reject the document. introduction of new field is not allowed
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "rating": {
+                        "type": "float"
+                    },
+                    "budget":{
+                        "type": "long"
+                    },
+                    "director": {
+                        "properties": {
+                            "dynamic": false,  ---> to turn of dynamic mapping for sub fields of director, it allows unknown fields but do not create mapping for them
+                            "name": {               (will not reject the document entirely)
+                                "type": "text"
+                            },
+                            "email": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
+                    "description": {
+                        "type": "text"
+                    },
+                    "actors": {
+                        "type": "nested",
+                        "properties": {
+                            "name": {
+                                "type": "text"
+                            },
+                            "age": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        GET /movies/_mapping
+
+    Mapping Api: 
+        Get Index Mapping: 
+            GET /movies/_mapping
+        Get Field's Mapping: 
+            GET /movies/_mapping/field/name
+        Update Mapping: 
+            If you want to update the mapping of a field then you have to create a new index and copy all the documents.
+        Add a new Field:
+            PUT movies/_mapping
+            {
+                "properties": {
+                    "language": {
+                        "type": "text"
+                    }
+                }
+            } 
+    
+    Reindex API: If you want to copy documents from one index to another, then you can do it through reindex api
+        POST _reindex
+        {
+            "source": {
+                "index": "source_index",
+                "query": {
+                    "match_all": {}
+                },
+                "_source": ["field1", "field2", "field3"]   ---> copy selected fields only
+            },
+            "dest": {
+                "index": "destination_index"
+            },
+            "script": {
+                "source": "ctx._source.new_field = 'new_value';",       ---> modify or add new fields
+                "lang": "painless"      ---> specifies the scripting language (Painless, Expression, Mustache, Groovy,
+                                             Javascript/python)
+            }
+        }
+
+    Coercion: The process of automatically converting data from one type to another during indexing or searching when the data type in the mapping does not match the data provided. Elastic search performs coercion to accommodate data that might not precisely match the expected data types defined in the mapping. Field level coerce takes higher priority than index level coerce and for both the default value is false.
+        PUT students
+        {
+            "settings": {
+                "index.mapping.coerce": false
+            },
+            "mappings": {
+                "properties": {
+                    "name": {
+                        "type": "text"
+                    },
+                    "age":{
+                        "type": integer,
+                        "coerence": true
+                    }
+                }
+            }
+        }
+
+    Datatypes in elastic search:
+        text: A data type for full text search and analysis of text data. Get stored in inverted index.
+        keyword: A data type for exact matching and filtering of keyword-like data, such as IDs, tags, emails,
+                 or categories. Get stored in doc values(for sorting and aggregation).
+        date: A data type for representing dates, stored as a long value representing milliseconds since epoch. 
+              Get stored in doc values(for renge queries and sorting).
+        integer: A data type for storing 32-bit signed integer. Get stored in doc values.
+        long: A data type for storing 64-bit signed integer. Get stored in doc values.
+        float: A data type for storing single-precision 32-bit floating-point numbers. Get stored in doc values.
+        double: A data type for storing double-precision 64-bit floating-point numbers. Get stored in doc values.
+        boolean: A data type for representing true or false values. Get stored in doc values.
+        object: A complex data type for representing structured objects with nested fields.
+        nested: A data type for handling arrays of complex objects, where each object is treated as an independent 
+                document.
+    
+    Index Templet: An index templet in elastic search is a way to define a set of configuration and mappings that will
+        automatically applied to new indices that match a specific pattern. Index templets are useful for automating the process of setting up and confuguring indices in elastic search, especially when you have a consistent naming convention for your indices or want to apply common settings to multiple indices.
+        When a new index is created that matches the pattern defined in an index template, elastic search applies the template's settings, mappings, and other configurations to the new index, ensuring consistency across your data.
+        (Means if you update index template it will be going to applied for new index only, and not for old index)
+
+        PUT _index_template/students_template
+        {
+            "index_patterns": ["student_class_*"],
+            "template": {
+                "settings": {
+                    "number_of_shards": 2,
+                    "number_of_replicas": 1
+                },
+                "mappings": {
+                    "properties": {
+                        "name": {
+                            "type": "text"
+                        },
+                        "id": {
+                            "type": "keyword"
+                        },
+                        "dob": {
+                            "type": "date"
+                        }
+                    }
+                }
+            }
+        }
+        GET _index_template/students_template
+        DELETE _index_template/students_template
+
+    Elastic Search Common Schema (ECS): Elastic search schema(ECS) is a standardized elasticsearch schema designed to 
+        provide a common set of fields names and data types for logsand metrics in the elastic stack, which includes elastic search, kibana, logstash, beats, and other related components.
+        ECS was introduced by elastic (the company behind the elastic stack) to promote interoperability, consistency, and ease of data analysis across different data sources and applications.
+
+        1. Standardization: ECS defines a standardized set of field names and data types for various common data fields in found in  and lodgs and matrics, such as timestamps, log levels, IP addresses, and user agents. This standardization allows different data sources to be easily ingested and analuzed in a undefined manner.
+
+        2. Flexibility: While ECS provides a standardized set of field names, it also allows for additional custom fields, to be added to accomodate specific use cases and data requirements. this means you can extend ECS to include domain-specific fields withjout losing compatibility with other ECS-compliant tools.
+
+        3. Interoperability: By using ECS, data from various sources can be ingested into elastic search and analyzed in kibana  without needing to define custom mappings or field names for each data source. Thjis simplifies the data integration process and makes it easier to build dashboards and visualizations that work with different data types.
+
+        4. Ecosystem Integration: ECS is defined to work seamlessly with various elastic stack components, including Beats(data shippers), Logstash(data processing), ElasticSearch(data storage and indexing), and Kibana(data visualization). It also integrates well with other ecosystem tools like machine learning features and SIEM (Security Information and Event Management) solutions.
+
+        Here are few examples of fields defined in Elastic Common Schema:
+        @timestamp: The timestamp of event, representing when the event occur.
+        message: The log message itself, capturing the primary content of the log entry.
+        host: The name or IP address of the host or source generating the log. 
+            user_agent: The user agent string, typically foound in web logs.
+            source.ip: The source IP address in network-related events.
+        destination.ip: The destination IP address in network-related events.
+    
+    Alias: In elasticsearch, an alias is an additional name, or lable assigned to one or more indexes. It acts as a pointer to one or more indexes. It acts as a pointer to the underlying indexes, allowing users to interact with them using a more user-friendly name. Aliases are dynamic and can be added, removed, or changed at any time without reindexing the data.
+    The purpose of Elasticsearch Alaises:
+        Abstraction and Decoupling: Alaises provide an abstraction layer, separating the physical index names from the logical names used in applications. This decoupling is beneficial when you want to change or reorginize your index structure without affecting your applications.
+        Blue(current)-Green(new) Deployments: During the deployment of a new version of an index, aliases can be used to perform a blue-green deployment. By switching the alias from the old index to th new one, you can ensure zero downtime and a smooth transition.
+        Filtered queries: Aliases enable the use of filtered queries. You can define an alias with a specific filter, and all queries routed through that alias will be  automatically filtered accordingly.
+        Cross-Cluster Search: Aliases can also be used to perform  cross-cluster search, allowing you to run queries across multiple clusters as if they were a single entity.
+    
+        POST _aliases
+        {
+            "actions": [
+                "add": {
+                    "index": "teachers",
+                    "alias": "school"
+                }
+            ]
+        }
+        POST _aliases
+        {
+            "actions": [
+                "add": {
+                    "index": "student",     ---> you can point same alias to multiple index and query them simultineously.
+                    "alias": "school"               Also One Index can have multiple aliases.
+                }
+            ]
+        }
+        POST _aliases
+        {
+            "actions": [
+                "remove": {
+                    "index": "teachers",
+                    "alias": "school"
+                }
+            ]
+        }
+        POST _aliases
+        {
+            "actions": [
+                "add": {
+                    "index": "students_*",      ---> you can also give pattern to match index temolets.
+                    "alias": "school"
+                }
+            ]
+        }
+        GET students_class_1/_alias
+        POST _aliases
+        {
+            "actions": [
+                "add": {
+                    "index": "teachers",
+                    "alias": "school",
+                    "is_write_index": true,     ---> define explicitly to write in which index when alias pointing to
+                    "filter": {                      multiple index
+                        "match": {
+                            "name": "Ram"   ---> You can also give filters while initializing alias
+                        }
+                    },
+                    "search_routing": 1,
+                    "index_routing": "1"
+                }
+            ]
+        }
+        PUT school/_doc/2{
+            "name": "Ram",
+            "age": 10
+        }
+
+    Query Types: 
+        1. Match query: This query is used to perform full-text search (Relavent data not exact match) on a field. It matches documents that contain a specific term.
+        {
+            "query": {
+                "match": {
+                    "field_name": "search_term_1 search_term_2",     ---> by default uses or operator
+                    "operator": "and"           ---> optional (by default or)
+                }
+            }
+        }   ---> shortcut for match query
+        {
+            "query": {
+                "match": {
+                    "field_name": {
+                        "query": "search_term_1 search_term_2"
+                        "operator": "and"   ---> by default or
+                        "fuzziness": 
+                        "analyzer": 
+                    }
+                }
+            }
+        }
+        2. Disjunction Max query: Combines multiple queries and retiurn documents that match any of the queries with the   highest score.
+        Query clauses: Comma separated queries.
+        Tie Breaker: It determines how much the individual scores of the query clauses contribute to the final relevance score. [0, 1] A tie breaker of 0 means only the maximum score matters (By default elastic searches uses tie breaker as 0), while a tie breaker of 1 means the individual scores matters as well.
+            score = max(score1, score2, score3, ..., scoreN) + tie breaker * (score1 + score2 + score3 + ... + scoreN)
+        {
+            "query": {
+                "dis_max": {
+                    "queries": [
+                        {"match": {"field_name_1": "search_term"}},
+                        {"match": {"field_name_2": "search_term"}}
+                    ],
+                    "tie_breaker": 0.2
+                }
+            }
+        }
+        3. Multi-match query: A versatile query that allows you to run the same query across multiple fields and combines the results.
+        The way the multi_match query is executed internally depends on the type parameter
+            best_fields (default): Find documents which match any field, but uses the _score from the best field.
+            most_fields: Find documents which match any field and combines the _score from each field.
+            cross_fields: Treat fields with the same analyzer as thoughthey were one big field. Looks for each word
+                in any field 
+            phrase: Runs a match_phrase on each field and uses the _score from the best field.
+            phrase_prefix: Runs a match_phrase_prefix query on each field and uses the _score from the best field.
+        {
+            "query": {
+                "multi_match": {
+                    "query": "cricket chess hob*",  ---> support wildcart
+                    "fields": ["bio", "hobbies^2"],    ---> if no fields given then *.* (search in all fields)
+                    "type": "most_fields",                  Individual fields can be boosted with the caret (^) notation.
+                    "tie_breaker": 0.2                      (^ = priority)
+                }                                           
+            }                                               
+        }
+        4. IDs query: The IDs query allows you to specify an array of document IDs to match. It retrives documents that have IDs that match any of the provided IDs.
+        {
+            "query": {
+                "ids": {
+                    "values": [1, 2, "sd123"]
+                }
+            }
+        }
+        5. Term query: This is used to find documents that contain a specific exact term in a perticular field. It is useful for searching fields that are not analyzed (keywords, boolean, numbers, dates).
+        {
+            "query": {
+                "term": {
+                    "field_name": "term_to_match",
+                    "case_insensitive": true        ---> optional (while searching keyword)
+                }
+            }
+        }
+        6. Renge query: It matches documents where the field value falls within a specific range of values.
+        {
+            "query": {
+                "range": {
+                    "field_name": {
+                        "lte": "2023-01-01",    ---> (lte/gte/lt/gt)
+                        "gte": "2023-06-30",
+                        "format": "yyyy-mm-dd",      ---> optional
+                        "time_zone": "+02:00"        ---> optional
+                    }
+                }
+            }
+        }
+        7. Bool query: A boolean query that allows you to combine multiple queries using boolean operators (must, should, must_not, filter) to create more complex queries.
+            must = and
+            should = or
+            must_not = not  ---> (not affect on relavence score), Subquerirs clauses response could be cached.
+            filter = for filer (not affect on relavence score so it is Fast query), Subquerirs clauses response could be
+                    cached
+        {
+            "query": {
+                "bool": {
+                    "must": [
+                        {
+                            "term": {
+                                "field": "value_to_search"
+                            }
+                        }
+                    ],
+                    "must_not": [
+                        {
+                            "term": {
+                                "field": "value_to_search"
+                            }
+                        }
+                    ],
+                    "should": [
+                        {
+                            "match": {
+                                "field_1": "value_to_search_1"
+                            }
+                        },
+                        {
+                            "match": {
+                                "field_2": "value_to_search_2"
+                            }
+                        }
+                    ],
+                    "minimum_should_match": 1,      ---> optional (for should that minimum 1 or given number queries match)
+                    "filter": [
+                        "term": {
+                            "field": "value_to_search"
+                        }
+                    ]
+                }
+            }
+        }
+       8. Exists query: This query matches documents where the specified field exists. Note that the field's value should have been indexed. (It works on fields and not on values and also not work if dynamic_mapping is false like mapping is required.)
+            "" = fetch
+            null = not fetch
+            [] = not fetch
+        {
+            "query": {
+                "exists": {
+                    "field": "field_name"
+                }
+            }
+        }
+        9. Wildcard query: This query supports wildcard patterns to match documents based on a pattern.
+            * = matches any sequence of characters (including none)
+            ? = matches a single character.
+        {
+            "query": {
+                "wildcard": {
+                    "field_name": "???i*",
+                }
+            }
+        }
+        {
+            "query": {
+                "wildcard": {
+                    "field_name": {
+                        "value": "???i",
+                        "case_insensitive": true    ---> optional (As wildcard does not support analyzer)
+                    }
+                }
+            }
+        }
+        10. Prefix query: It matches documents that have fields containing terms with a specified prefix.
+        {
+            "query": {
+                "prefix": {
+                    "field_name": "value",
+                }
+            }
+        }
+        {
+            "query": {
+                "prefix": {
+                    "field_name": {
+                        "value": "VALUE",
+                        "case_insensitive": true    ---> optional (As prefix does not support analyzer)
+                    }
+                }
+            }
+        }
+        11. Match phrase prefix query: This query is particulary useful when you want to match documents that starts with a certain phrase and potentially continue with more characters.
+        {
+            "query": {
+                "match_phrase_prefix": {
+                    "field_name": "your exact phrase here"   ---> order matters
+                }
+            }
+        }
+        12. Match phrase query: It is useful for finding exact phrases within a text field and is especially valuable when you want to retrieve results that include the words in a specific order.
+        {
+            "query": {
+                "match_phrase": {
+                    "field_name": "your exact phrase here"   ---> order matters
+                }
+            }
+        }
+        13. Nested queries: Used to query nested objects within documents.
+        {
+            "bag": [
+                {
+                    "name": "chocklate",
+                    "quantity": 2
+                },
+                {
+                    "name": "whistles",
+                    "quantity": 5
+                }
+            ]
+        }
+        {
+            "query": {
+                "nested": {
+                    "path": "bag",
+                    "inner_hits": {"name": "alias_name", "size": 3} ---> To see which nested fields is matched 
+                                                                        (name = alias for this field, 
+                                                                        size: how many matches will appear)
+                    "query": {
+                        "bool": {
+                            "must": [
+                                {
+                                    "match": {
+                                        "bag.name": "whistle"   ---> to query on object fields 
+                                    }
+                                },
+                                {
+                                    "range": {
+                                        "bag.quantity": {
+                                            "gte": 2 
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+
+        Relevance score: Measures how well each document matches a query. It comes in sorted order like highest matches comes on top.
+
+    Join Data Types (Parent child relationship): The join datatype in elastic search allows you to model parent-child relationships between documents within the same index. This particularly useful when you have data that can be logically structured as a parent document and one or more child documents related to that parent. Elasticsearch's parent-child relationship doesn't exactly map to the sql concept of left join, right join, or inner join. It's more about structuring data and establishing relationships between documents within the same index.
+    Limitations: parent and child should be in the same index and same shard, only one join field, and a document can have only one parent.
+    PUT company
+    {
+        "mappings": {
+            "properties": {
+                "my_join_field": {  ---> This field indicates weather a document is a parent or a child and specifies the
+                    "type": "join",      type of parent it is associated with.
+                    "relations": {
+                        "dept": "emp"   ---> (parent: child)
+                    }
+                }
+            }
+        }
+    }
+
+    PUT company/_doc/1
+    {
+        "name": "HR",
+        "my_join_field": "dept"
+    }
+    PUT company/_doc/2
+    {
+        "name": "IT",
+        "my_join_field": "dept"
+    }
+
+    PUT company/_doc/3?routing=1    ---> default routing is on ID (child doc must be present in parent doc shard)
+    {
+        "name": "Ram",
+        "my_join_field": {
+            "name": "emp",
+            "parent": 1         ---> define ID of parent
+        }
+    }
+    PUT company/_doc/4?routing=2 
+    {
+        "name": "Shyam",
+        "age": 25,
+        "my_join_field": {
+            "name": "emp",
+            "parent": 2
+        }
+    }
+
+        ## Quering child by parent ##
+
+    GET company/_search
+    {
+        "query": {
+            "parent_id": {
+                "id": 1,        ---> get childs for this parent id of type emp
+                "type": "emp"
+            }
+        }
+    }
+
+    GET company/_search 
+    {
+        "query": {
+            "has_parent": {
+                "parent_type": "dept",  ---> Bring all the child docs of parent type dept of name HR
+                "score": true,          ---> optional (add parent match score also)
+                "query": {
+                    "match": {
+                        "name": "HR"
+                    }
+                }
+            }
+        }
+    }
+
+        ## Quering parent by child ##
+
+    GET company/_search     ---> Fetch dept which has child emp age greater than 10
+    {
+        "query": {
+            "has_child": {
+                "type": "emp",
+                "query": {
+                    "range": {
+                        "age": {
+                            "gte": 10
+                        }
+                    }
+                }
+            }
+        }
+    }
+    GET company/_search     ---> Fetch dept which has child emp by name Ram
+    {
+        "query": {
+            "has_child": {
+                "type": "emp",
+                "query": {
+                    "match": {
+                        "name": "Ram"
+                    }
+                }
+            }
+        }
+    }
+    GET company/_search     ---> Fetch dept which has child minimum 10 and maximum 20 emp age greater than 65
+    {
+        "query": {
+            "has_child": {
+                "type": "emp",
+                "min_children": 10,
+                "max_children": 20,
+                "query": {
+                    "range": {
+                        "age": {
+                            "gte": 65
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+        ## Mluti level relations ##
+    PUT company
+    {
+        "mappings": {
+            "properties": {
+                "join_field": {  
+                    "type": "join",      
+                    "relations": {
+                        "company": ["dept", "clients"],     ---> company parent has 2 childs dept and clients
+                        "dept": "emp"                       ---> also dept has child emp
+                    }
+                }
+            }
+        }
+    }
+
+    PUT company/_doc/1
+    {
+        "name": "Apple",
+        "join_field": "company"
+    }
+    PUT company/_doc/2
+    {
+        "name": "Google",
+        "join_field": "company"
+    }
+
+    PUT company/doc/3?routing=1
+    {
+        "name": "IT",
+        "join_field": {
+            "name": "dept",
+            "parent": 1
+        }
+    }
+    PUT company/doc/4?routing=2
+    {
+        "name": "HR",
+        "join_field": {
+            "name": "dept",
+            "parent": 2
+        }
+    }
+
+    PUT company/doc/5?routing=2        ---> routing of grand parent shard as the parent shard present there only
+    {
+        "name": "Ram",
+        "join_field": {
+            "name": "emp",
+            "parent": 4
+        }
+    }
+    PUT company/doc/5?routing=1
+    {
+        "name": "Shyam",
+        "join_field": {
+            "name": "emp",
+            "parent": 3
+        }
+    }
+
+    GET company/_search     ---> Get company which has employee by name Ram
+    {
+        "query": {
+            "has_child": {
+                "type": "dept",
+                "inner_hits": {},   ---> optional (to see which dept were matching in between)
+                "query": {
+                    "has_child": {
+                        "type": "emp",
+                        "query": {
+                            "match": {
+                                "name": "Ram"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Aggregations (Supported for keyword, long, int): Aggregations are a powerful feature in elasticsearch that allow you to perform data analysis and extract insights from your indexed data. They are used to group, filter, and compute statistics on your data.
+    Elasticsearch organizes aggregations into three categories: 
+        Metrics aggregations: Metric aggregations calculate metrics (statistics) over a set of documnets. They provide insights into the numeric values within the documents.
+            Single-value numeric metrics aggregations: output a single numeric metric.
+            Multi-value numeric metrics aggregations: output multiple numeric metrics.
+        Bucket aggregations: Bucket aggregations, as opposed to metrics aggregations, can hold sub-aggregations. These sub-aggregations will be aggregated for the buckets created by their "parent" bucket aggregation 
+        GET movies/_serach
+        {
+            "size": {
+                "aggs": {
+                    "group_by_genre": {                 ---> movies group by genre
+                        "terms": {
+                            "field": "genre.keyword",
+                            "min_doc_count": 2,             ---> min 2 in genre then only group
+                            "missing": "no_genre",          ---> group if genre field is missing
+                            "size": 1
+                        }
+                    },
+                    "aggs": {
+                        "my_stats": {
+                            "stats": {
+                                "field": "ratings"          ---> group wise stats
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        GET movies/_search                  ---> List movies bys Drama genre with shortest length aggs
+        {
+            "size": 0,
+            "query": {
+                "match": {
+                    "genre": "Drama"
+                }
+            },
+            "aggs": {
+                "minimum_length_movies": {
+                    "min": {
+                        "field": "length"
+                    }
+                }
+            }
+        }
+        GET movies/_search      ---> group movies that you want to watch today and tomorrow with movies list (customize)
+        {
+            "size": 0,
+            "plan": {           ---> customize by yourself (bucket/filter)
+                "filters": {
+                    "filters": {
+                        "today": {
+                            "term": {
+                                "genre.keyword": "Drama" 
+                            }
+                        },
+                        "tomorrow": {
+                            "term": {
+                                "genre.keyword": "Action" 
+                            }
+                        },
+                    }
+                },
+                "aggs": {
+                    "name_of_movies": {
+                        "top_hits": {       ---> aggs type
+                            "size": 10,
+                            "_source": {
+                                "includes": ["name"]        ---> include only name in list
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        GET movies/_search
+        {
+            "size": 0,
+            "aggs": {
+                "group_by_range": {
+                    "range": {
+                        "field": "release_year",
+                        "keyed": true,               ---> optional, "1990-2000": {} (keyed: "1990 - 2000" if false)
+                        "ranges": [
+                            {
+                                "to": 1990,
+                                "key": "old movies"         ---> optional (key name = old movies)
+                            },
+                            {
+                                "from": 1990,
+                                "to": 2000
+                            },
+                            {
+                                "from": 2000
+                            }
+                        ],
+                        "aggs": {
+                            "my_status": {
+                                "stats": {
+                                    "field": "length"
+                                }
+                            }
+                        }
+                    } 
+                }
+            }
+        }
+        GET movies/_search
+        {
+            "size": 0,
+            "query": {
+                "match": {
+                    "genre": "Drama"
+                }
+            },
+            "aggs": {
+                "my_histogram": {
+                    "global": {}        ---> irrespective of query aggs for entire data 
+                    "aggs": {
+                        "new_name": {
+                            "histogram": {              ---> aggs type (distributes data into equal intervals)
+                                "field": "release_year",
+                                "interval": 5,          ---> groups by 5 years interval (1990-1995, 1995-2000, 2000-2005)
+                                "min_doc_count": 2,  ---> removes groups which has less than 2 docs
+                                "extended_bounds": {        
+                                    "min": 1900,            ---> intervals starts from 1900
+                                    "max": 3000             ---> intervals till 3000
+                                }
+                            }
+                        }
+                    }            
+                },
+                "aggs": {
+                    "name_of_movies": {
+                        "top_hits": {       ---> aggs type
+                            "size": 10,
+                            "_source": ["name"]        ---> include only name in list
+                        }
+                    }
+                }
+            }
+        }
+        GET movies/_search
+        {
+            "size": 0,
+            "aggs": {
+                "docs_without_length_field": {
+                    "missing": {        ---> name of aggs (group docs with no length field)
+                        "field"; "length"
+                    }
+                },
+                "aggs": {
+                    "name": {
+                        "stats": {
+                            "field": "rating"
+                        }
+                    }
+                }
+            }
+        }
+
+        books: 
+        {
+            "authors": [
+                {
+                    "name": "Author A",
+                    "age": 29,
+                    "nationality": "Country X"
+                },
+                {
+                    "name": "Author B",
+                    "age": 30,
+                    "nationality": "Country Y"
+                }
+            ]
+        }
+
+        GET books/_search
+        {
+            "size": 0,
+            "aggs": {
+                "average_age_of_all_authors": {
+                    "nested": {                 ---> creates bucket for nested doc
+                        "path": "authors"       ---> path from root
+                    },
+                    "aggs": {
+                        "average_of_all": {
+                            "avg": {
+                                "field": "authors.age"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Pipeline aggregations. 
+
+        Fuzziness: A search technique that allows for approximate matching of terms, rather than strict exact matches. This is perticularly useful when dealing with typos, misspellings, or variations in word forms, enabling Elasticsearch to retrieve relavent documents even if the search query doesn't exactly match ther terms in the indexed documents. Fuzziness is controlled by the fuzziness parameter, which is a non-negative integer value representing the allowable edit distance between the search term and the terms in the indexed documents. The edit distance refers to the number of single character changes (insertion, deletion, substitution and transposition) needed to transform one term into another. A higher fuzziness value allows for more differences between terms.
+            insertion: adding a character to the term.
+            deletion: removing the character from the term.
+            substitution: replacing one character with another.
+            transposition: swapping adjacent characters in the term.
+        {
+            "query": {
+                "match": {
+                    "name": {
+                        "query": "night",
+                        "fuzziness": 1          ---> you can also give "auto" (elasticsearch will automatic assign value
+                                                     of fuzziness by the length of term) value will be 0, 1, 2 only and for auto - term length 0-2 = 0, 3-5 = 1, >5 = 2
+                    }
+                }
+            }
+        }
+        {
+            "query": {
+                "match": {
+                    "query": "cork night",
+                    "fuzziness": 1              ---> 1 for only one word not for two individuals
+                }
+            }
+        }
+        {
+            "query": {
+                "fuzzy": {
+                    "name": {
+                        "value": "night"    ---> bydefault fuzziness is auto ( Not analyzes term NIGHT not work)
+                    }
+                }
+            }
+        }
+
+    Document structure-
+    {
+        "name": "The Shawshank Redemption",
+        "actors": [
+            "Tim Robbins",
+            "Morgan Freeman"
+        ],
+        "director": "Frank Darabont",
+        "rating": 9.3,
+        "genre": "Drama",
+        "budget": 25000000,
+        "box_office": 28699976,
+        "length": 142,
+        "release_year": 1994
+    }
+    GET movies/_search
+    {
+        "query": {                      ---> optional (as bydefault is runs match_all)
+            "match_all": {}
+        },
+        "size": 0,
+        "aggs": {                       
+            "average_of_rating": {      ---> name of output field
+                "avg": {                ---> type of aggregation (avg, sum, min, max)
+                    "field": "rating"   ---> on which field aggregation is applied
+                }
+            },
+            "sum_of_length": {      
+                "avg": {                
+                    "field": "length"   
+                }
+            },
+            "distinct_directors": {     ---> gives distinct count (calculate approximate value)
+                "cardinality": {
+                    "field": "director.keyword", ---> append .keyword if it's not text and it is keyword
+                    "precision_threshold": 100   ---> (Optional) Give precision threshold to give accurate count 
+                                                        below that number.(If 10,000 movies, give it 10,000 for accurate output. Otherwise, if it's 5,000, then if 5,000 are distinct, it is correct; but if over 5,000, then it's approximate.) Bydefault value is 3000 and maximum supported value is 40000.
+                }
+            },
+            "total_movies": {
+                "value_count": {
+                    "field": "name.keyword"
+                }
+            },
+            "statics": {
+                "stats": {
+                    "field": "ratings"
+                }
+            }
+        }
+    }
+
+Query DSL (Domain Specific Language): 
+    Method Api_Name/Command?Parameters
+
+    Document Structure : 
+        {
+            "_index": "name",
+            "_id": "12345",
+            "score": 1.0,
+            "_seq_no": 1,
+            "_primary_term": 1,
+            "_source": {
+                "name": "Rahul",
+                "age": 20
+            }
+            
+        }
+
+GET _cluster/health
+GET _cat/nodes   ---> cat means pick data in human readable format
+GET _cat/indices?v&expand_wildcards=all ---> v means give headers and expand_wildcards=all means show all indices including hidden ones
+GET /_cat/shards?v ---> show shards
+
+    ## GET Document ##
+GET /name/_doc/12345 ---> get document
+GET /name/_search
+{
+    "size": 20,     ---> how many documents will list
+    "from": 3,  ---> offset
+    "_source": ["name", "auther.*", "book.name"]    ---> which fields will come in _source field in searched documents
+    "query": {                                              (Also supports wildcards)
+        "match_all": {}
+    }
+}
+
+    ## Create Index ##
+PUT /name ---> create index
+PUT /name
+{
+    "settings": {
+        "number_of_shards": 3,
+        "number_of_replicas": 1
+    }
+}
+
+    ## Delete Document ##
+DELETE /name ---> delete index
+DELETE /name/_doc/12345 ---> delete document
+
+    ## Create Document ##
+POST /name/_doc ---> indexed the document (create document)
+{
+    "name": "Rahul",
+    "age": 20
+}
+POST /name/_doc/12234 ---> you can also give id to document
+{
+    "name": "Rahul",
+    "age": 20
+}
+
+
+    ## Update Document ##
+POST /name/_update/12345 ---> update document
+{
+    "doc": {
+        "age": 21,
+        "last_name": "Kumar"
+    }
+}
+POST /name/_update/12345 ---> scripted update (custom logic)
+{
+    "script": {
+        "source": "ctx._source.age = ctx._source.age + 1"           ---> ctx._source is the document 
+    } 
+}
+POST /name/_update/12345 ---> scripted update (custom logic)
+{
+    "script": {
+        "source": "ctx._source.age = params.new_age",   ---> if you want to pass parameter to script then use params
+        "params": {
+            "new_age": 25
+        }
+    }
+}
+POST /name/_update/12345 ---> scripted update (custom logic)
+{
+  "script": {
+    "source": """                           ---> """ """ = multilline script
+      if (ctx._source.age <= 0) {
+          ctx.op = "delete";                ---> delete means delete the document
+      } else if (ctx._source.age > 100) {
+          ctx.op = "noop";                  ---> noop means do nothing and it will not update the document
+      } else {
+          ctx._source.age--;
+      }
+    """
+  }
+}
+
+    ## Upsert Document ##
+POST /name/_update/12345 --->
+{
+    "script": {
+        "source": "ctx._source.age++"
+    },
+    "upsert": {
+        "name": "Rahul",
+        "age": 20
+    }
+}
+
+    ## Replace Document ##
+PUT /name/_doc/12345 ---> Replace document with id
+{
+    "name": "Ram",
+    "age": 31
+}
+
+    ## Update by Query ##
+POST /name/_update_by_query
+{
+    "query":{
+        "match_all": {}
+    },
+    "script": {
+        "source": "ctx._source.age = ctx._source.age++"
+    }
+}
+
+    ## Delete by Query ##
+POST /name/_delete_by_quer
+{
+    "query":{
+        "match_all": {}
+    }
+}
+
+    ## Bulk Api ##
+POST /your-index-name/_bulk
+{ "index": { "_id": "1" } }
+{ "name": "John", "age": 25 }
+{ "create": {} }
+{ "name": "Kay", "age": 26 }
+{ "update": { "_id": "1" } }
+{ "doc": { "age": 26 } }
+{ "delete": { "_id": "1" } }
+
+    ## Search ##
+GET /index_name/_search
+{
+    "query":{
+        // your query goes here
+    },
+    // additional parameters and options can be included here
+}
