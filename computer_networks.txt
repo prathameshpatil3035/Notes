@@ -1,0 +1,297 @@
+====================================================================
+Computer Networks — Topologies & Modes of Transmission
+====================================================================
+
+1. Network Topologies
+--------------------------------------------------------------------
+Definition:
+- Topology defines the **physical or logical layout** of network devices and connections.
+
+Types of Topologies:
+
++-------------------+-----------------------------+--------------------------------------+
+| Topology          | Description                 | Advantages / Disadvantages           |
++-------------------+-----------------------------+--------------------------------------+
+| Bus               | Single central cable; nodes | + Easy to install                    |
+|                   | connected                   | - Difficult to troubleshoot          |
+|                   |                             | - Collision prone                    |
++-------------------+-----------------------------+--------------------------------------+
+| Star              | Nodes connected to central  | + Easy to manage                     |
+|                   | hub/switch                  | + Failure of one node doesn't affect |
+|                   |                             | - Hub failure stops network          |
++-------------------+-----------------------------+--------------------------------------+
+| Ring              | Nodes connected in a circle | + Data flows in one direction        |
+|                   |                             | + No collisions with token passing   |
+|                   |                             | - Single link failure affects network|
++-------------------+-----------------------------+--------------------------------------+
+| Mesh              | Every node connected to     | + High redundancy, reliable          |
+|                   | every other node            | + Failure of one node doesn't stop   |
+|                   |                             | - Expensive & complex                |
++-------------------+-----------------------------+--------------------------------------+
+| Tree / Hierarchical| Combination of star & bus  | + Scalable                           |
+|                   |                             | - Backbone failure affects branches  |
++-------------------+-----------------------------+--------------------------------------+
+| Hybrid            | Combination of topologies   | + Flexible & scalable                |
+|                   |                             | - Complex design                     |
++-------------------+-----------------------------+--------------------------------------+
+
+--------------------------------------------------------------------
+2. Modes of Transmission
+--------------------------------------------------------------------
+Definition:
+- Determines **how data flows between devices** in a network.
+
++-------------------+-----------------------------+-------------------------------------------+
+| Mode              | Description                 | Examples                                  |
++-------------------+-----------------------------+-------------------------------------------+
+| Simplex           | Data flows in **one direction** only | Keyboard → CPU, Monitor display  |
++-------------------+-----------------------------+-------------------------------------------+
+| Half-Duplex       | Data flows in **both directions**  | Walkie-talkies, Ethernet (CSMA/CD) |
+|                   | **but not simultaneously** |                                            |
++-------------------+-----------------------------+-------------------------------------------+
+| Full-Duplex       | Data flows in **both directions**  | Telephone, Modern Ethernet (Switch)|
+|                   | **simultaneously**         |                                            |
++-------------------+-----------------------------+-------------------------------------------+
+
+
+====================================================================
+Computer Networks — Complete Notes
+====================================================================
+
+1. Layering Basics
+--------------------------------------------------------------------
+Definition:
+- Layering divides network functions into **independent layers**.
+- Each layer provides **services to the layer above** and uses **services of the layer below**.
+- Advantages:
+  + Simplifies design & troubleshooting
+  + Standardizes protocols
+  + Allows interoperability between different vendors
+
+Models:
+- **OSI Model (7 Layers)**
+- **TCP/IP Model (4 Layers)**
+
+--------------------------------------------------------------------
+2. OSI Model (7 Layers)
++---------------------+----------------------------+------------------------------+
+| Layer (No.)         | Function                   | Example Protocols            |
++---------------------+----------------------------+------------------------------+
+| Application (7)     | User-level services        | HTTP, FTP, SMTP, DNS, SNMP   |
+| Presentation (6)    | Data translation, encoding | SSL/TLS, MIME                |
+| Session (5)         | Session management         | NetBIOS, RPC, PPTP           |
+| Transport (4)       | Reliable/unreliable delivery| TCP, UDP, SCTP              |
+| Network (3)         | Logical addressing, routing| IP, ICMP, ARP, OSPF, BGP     |
+| Data Link (2)       | Node-to-node delivery      | Ethernet MAC, PPP, HDLC      |
+| Physical (1)        | Bit transmission           | Ethernet PHY, DSL, Wi-Fi PHY |
++---------------------+----------------------------+------------------------------+
+
+--------------------------------------------------------------------
+3. TCP/IP Model (4 Layers)
++---------------------+----------------------------+------------------------------+
+| Layer               | Function                   | Example Protocols            |
++---------------------+----------------------------+------------------------------+
+| Application         | User services              | HTTP, FTP, SMTP, DNS, SSH    |
+| Transport           | End-to-end delivery        | TCP, UDP, SCTP               |
+| Internet            | Logical addressing         | IP, ICMP, ARP                |
+| Network Access/Link | Physical + Data Link       | Ethernet, Wi-Fi, PPP         |
++---------------------+----------------------------+------------------------------+
+
+--------------------------------------------------------------------
+4. Physical Layer Protocols (L1)
++----------------------+-----------------------------------------+
+| Protocol / Standard  | Description                             |
++----------------------+-----------------------------------------+
+| Ethernet PHY         | Wired LAN signaling & speed             |
+| DSL                  | Internet over telephone lines           |
+| ISDN                 | Digital voice & data                    |
+| SONET / SDH          | Fiber optic high-speed                  |
+| Wi-Fi PHY (802.11)   | Wireless RF & modulation                |
+| Bluetooth PHY        | Short-range wireless                    |
+| USB                  | Peripheral communication                |
+| RS-232 / RS-485      | Serial communication                    |
+| Optical Fiber Std.   | Fiber transmission (e.g., ITU-T G.652)  |
+| 5G / LTE PHY         | Cellular radio transmission             |
++----------------------+-----------------------------------------+
+
+--------------------------------------------------------------------
+5. Data Link Layer Protocols (L2)
++----------------------+-----------------------------------------+
+| Protocol / Standard  | Description                             |
++----------------------+-----------------------------------------+
+| Ethernet MAC+LLC     | Wired LAN framing                       |
+| Wi-Fi MAC            | Wireless LAN framing                    |
+| PPP                  | Point-to-Point                          |
+| HDLC                 | Reliable WAN link                       |
+| Frame Relay          | Virtual circuit packet switching        |
+| ATM                  | High-speed cell switching               |
+| ARP / RARP           | IP to MAC resolution                    |
+| Token Ring           | Token-based access                      |
+| CAN                  | Automotive network                      |
+| LAPB / LAPD          | X.25 / ISDN                             |
+| FDDI                 | Fiber LAN communication                 |
++----------------------+-----------------------------------------+
+
+--------------------------------------------------------------------
+6. Multiple Access Protocols (MAC Sublayer)
++----------------+----------------------------------------+
+| Type           | Protocol / Description                 |
++----------------+----------------------------------------+
+| Random Access  | ALOHA: Transmit anytime, retransmit    |
+|                | CSMA: Listen before sending            |
+|                | CSMA/CD: Detect collisions (Ethernet)  |
+|                | CSMA/CA: Avoid collisions (Wi-Fi)      |
++----------------+----------------------------------------+
+| Controlled     | Token Passing: Only token holder sends |
+| Access         | Polling: Master invites devices        |
+|                | Reservation: Reserve slots before send |
++----------------+----------------------------------------+
+| Channelization | FDMA: Separate frequency bands         |
+|                | TDMA: Separate time slots              |
+|                | CDMA: Shared frequency, unique codes   |
++----------------+----------------------------------------+
+
+--------------------------------------------------------------------
+7. Network Topologies
++-------------------+-----------------------------+---------------------------+
+| Topology          | Description                 | Advantages / Disadvantages|
++-------------------+-----------------------------+---------------------------+
+| Bus               | Single central cable        | + Easy to install         |
+|                   |                             | - Troubleshooting hard    |
+| Star              | Nodes connect to hub/switch | + Easy management         |
+|                   |                             | - Hub failure stops net   |
+| Ring              | Nodes in a circle           | + No collisions (token)   |
+|                   |                             | - Single link fails net   |
+| Mesh              | Every node to every node    | + High redundancy         |
+|                   |                             | - Expensive & complex     |
+| Tree              | Combination of star & bus   | + Scalable                |
+|                   |                             | - Backbone failure        |
+| Hybrid            | Combination topologies      | + Flexible & scalable     |
+|                   |                             | - Complex design          |
++-------------------+-----------------------------+----------------------------+
+
+--------------------------------------------------------------------
+8. Modes of Transmission
++-------------------+-----------------------------+----------------------------+
+| Mode              | Description                 | Examples                   |
++-------------------+-----------------------------+----------------------------+
+| Simplex           | One-way data flow           | Keyboard → CPU             |
+| Half-Duplex       | Both ways, not simultaneous | Walkie-talkies             |
+| Full-Duplex       | Both ways simultaneously    | Telephone, Switch Ethernet |
++-------------------+-----------------------------+----------------------------+
+
++---------------------------+--------------------------------+
+| OSI / TCP-IP Layer        | Data Unit                      |
++---------------------------+--------------------------------+
+| Application               | Data / Message                 |
+| Presentation              | Data / Message                 |
+| Session                   | Data / Message                 |
+| Transport                 | Segment (TCP) / Datagram (UDP) |
+| Network / Internet        | Packet                         |
+| Data Link / Network Access| Frame                          |
+| Physical                  | Bit                            |
++---------------------------+--------------------------------+
+
+====================================================================
+Computer Networks — Physical & Data Link Layer Protocols
+====================================================================
+
+1. Physical Layer (L1)
+--------------------------------------------------------------------
+Function:
+- Transmits raw bits (0s and 1s)
+- Defines hardware: cables, connectors, signals
+- Bit synchronization, data rate, physical topology
+
+Protocols / Standards:
++----------------------+-----------------------------------------+
+| Protocol / Standard  | Description                             |
++----------------------+-----------------------------------------+
+| Ethernet PHY         | Wired LAN signaling and speed           |
+| DSL                  | Internet over telephone lines           |
+| ISDN                 | Digital voice and data                  |
+| SONET / SDH          | High-speed fiber optic                  |
+| Wi-Fi PHY            | Wireless RF and modulation              |
+| Bluetooth PHY        | Short-range wireless                    |
+| USB                  | Peripheral communication                |
+| RS-232 / RS-485      | Serial communication                    |
+| Optical Fiber Std.   | Fiber transmission (ITU-T G.652)        |
+| 5G / LTE PHY         | Cellular radio transmission             |
++----------------------+-----------------------------------------+
+
+--------------------------------------------------------------------
+2. Data Link Layer (L2)
+--------------------------------------------------------------------
+Function:
+- Node-to-node reliable communication
+- Error detection and correction
+Sublayers:
+- LLC: Flow control, error checking
+- MAC: Controls medium access
+
+Protocols:
++----------------------+-----------------------------------------+
+| Protocol / Standard  | Description                             |
++----------------------+-----------------------------------------+
+| Ethernet MAC+LLC     | Wired LAN framing                       |
+| Wi-Fi MAC            | Wireless LAN framing                    |
+| PPP                  | Point-to-Point communication            |
+| HDLC                 | Reliable WAN link                       |
+| Frame Relay          | Virtual circuit packet switching        |
+| ATM                  | High-speed cell switching               |
+| ARP / RARP           | IP to MAC resolution                    |
+| Token Ring           | Token-based access                      |
+| CAN                  | Automotive network                      |
+| LAPB / LAPD          | X.25 / ISDN                             |
+| FDDI                 | Fiber LAN communication                 |
++----------------------+-----------------------------------------+
+
+--------------------------------------------------------------------
+3. Multiple Access Protocols (MAC Sublayer)
+--------------------------------------------------------------------
+Function:
+- Controls access to shared medium
+- Avoids collisions
+
+Types:
+
+A. Random Access
++----------------+----------------------------------------+
+| Protocol       | Description                            |
++----------------+----------------------------------------+
+| ALOHA          | Transmit anytime, retransmit on coll.  |
+| CSMA           | Listen before transmitting             |
+| CSMA/CD        | Detect collisions (Ethernet)           |
+| CSMA/CA        | Avoid collisions (Wi-Fi)               |
++----------------+----------------------------------------+
+
+B. Controlled Access
++----------------+----------------------------------------+
+| Protocol       | Description                            |
++----------------+----------------------------------------+
+| Token Passing  | Token holder transmits only            |
+| Polling        | Master invites devices                 |
+| Reservation    | Reserve slots before sending           |
++----------------+----------------------------------------+
+
+C. Channelization
++----------------+----------------------------------------+
+| Protocol       | Description                            |
++----------------+----------------------------------------+
+| FDMA           | Separate frequency bands               |
+| TDMA           | Separate time slots                    |
+| CDMA           | Shared frequency, unique codes         |
++----------------+----------------------------------------+
+
+--------------------------------------------------------------------
+Summary Table
++----------------------+-----------------------------+--------------------------+
+| OSI Layer            | Examples                    | Main Function            |
++----------------------+-----------------------------+--------------------------+
+| Physical (L1)        | Ethernet PHY, Wi-Fi PHY,    | Transmission of raw bits |
+|                      | DSL, SONET, Bluetooth       |                          |
+| Data Link (L2)       | Ethernet MAC, PPP, HDLC,   | Reliable link, framing,   |
+|                      | Wi-Fi MAC, Frame Relay      | error detection          |
+| Multiple Access (L2) | ALOHA, CSMA/CD, CSMA/CA,   | Medium access control     |
+|                      | FDMA, TDMA, CDMA            |                          |
++----------------------+-----------------------------+--------------------------+
