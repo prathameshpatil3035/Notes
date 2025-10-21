@@ -41,22 +41,81 @@ Types of Topologies:
 Definition:
 - Determines **how data flows between devices** in a network.
 
-+-------------------+-----------------------------+-------------------------------------------+
-| Mode              | Description                 | Examples                                  |
-+-------------------+-----------------------------+-------------------------------------------+
-| Simplex           | Data flows in **one direction** only | Keyboard → CPU, Monitor display  |
-+-------------------+-----------------------------+-------------------------------------------+
-| Half-Duplex       | Data flows in **both directions**  | Walkie-talkies, Ethernet (CSMA/CD) |
-|                   | **but not simultaneously** |                                            |
-+-------------------+-----------------------------+-------------------------------------------+
-| Full-Duplex       | Data flows in **both directions**  | Telephone, Modern Ethernet (Switch)|
-|                   | **simultaneously**         |                                            |
-+-------------------+-----------------------------+-------------------------------------------+
++-------------------+--------------------------------------+-------------------------------------------+
+| Mode              | Description                          | Examples                                  |
++-------------------+--------------------------------------+-------------------------------------------+
+| Simplex           | Data flows in **one direction** only | Keyboard → CPU, Monitor display           |
++-------------------+--------------------------------------+-------------------------------------------+
+| Half-Duplex       | Data flows in **both directions**    | Walkie-talkies, Ethernet (CSMA/CD)        |
+|                   | **but not simultaneously**           |                                           |
++-------------------+--------------------------------------+-------------------------------------------+
+| Full-Duplex       | Data flows in **both directions**    | Telephone, Modern Ethernet (Switch)       |
+|                   | **simultaneously**                   |                                           |
++-------------------+--------------------------------------+-------------------------------------------+
 
+-----------------------------------------------------------------------------------------------------
++------------+---------------------------+---------------------------+-------------------------+---------------------------+
+| Network    | Range / Area              | Common Devices            | Protocols / Standards   | Layer / Example           |
++------------+---------------------------+---------------------------+-------------------------+---------------------------+
+| PAN        | 1 - 10 meters             | Smartphone, Headphones,   | Bluetooth, USB, ZigBee  | Physical / Data Link      |
+|            |                           | Smartwatch, IoT Devices   |                         | Example: Bluetooth        |
++------------+---------------------------+---------------------------+-------------------------+---------------------------+
+| LAN        | Up to 100m (wired)        | PC, Switch, Router,       | Ethernet, Wi-Fi         | Physical / Data Link /    |
+|            | ~100m indoors (wireless)  | Printer, Access Point     | IEEE 802.3, 802.11      | Network                   |
+|            |                           |                           |                         | Example: Office Wi-Fi     |
++------------+---------------------------+---------------------------+-------------------------+---------------------------+
+| MAN        | 1 km - 50 km              | Router, Switch,           | Fiber, Metro Ethernet,  | Data Link / Network       |
+|            |                           | Repeater, Access Points   | MPLS                    | Example: City Campus LAN  |
++------------+---------------------------+---------------------------+-------------------------+---------------------------+
+| WAN        | Thousands of km           | Router, Modem, Switch,    | TCP/IP, MPLS, Frame     | Network / Transport       |
+|            |                           | Satellite Link, Server    | Relay, ATM              | Example: Internet         |
++------------+---------------------------+---------------------------+-------------------------+---------------------------+
+| Wi-Fi      | ~100 m indoors            | Laptop, Smartphone,       | IEEE 802.11 a/b/g/n/ac  | Physical / Data Link /    |
+|            |                           | Access Point, Router      |                         | Network                   |
++------------+---------------------------+---------------------------+-------------------------+---------------------------+
+| Bluetooth  | ~10 m                     | Headphones, Phone,        | Bluetooth (802.15.1)    | Physical / Data Link      |
+|            |                           | Smartwatch, IoT Device    |                         | Example: WPAN             |
++------------+---------------------------+---------------------------+-------------------------+---------------------------+
 
-====================================================================
-Computer Networks — Complete Notes
-====================================================================
++-------------------+-----------------------+---------------------------+------------------------------------+
+| Device            | OSI Layer             | Cable / Medium            | Description / Use                  |
++-------------------+-----------------------+---------------------------+------------------------------------+
+| Hub               | Physical (Layer 1)    | Twisted Pair, Coaxial     | Broadcasts signals to all ports    |
++-------------------+-----------------------+---------------------------+------------------------------------+
+| Repeater          | Physical (Layer 1)    | Twisted Pair, Fiber Optic | Regenerates and amplifies signal   |
++-------------------+-----------------------+---------------------------+------------------------------------+
+| Switch            | Data Link (Layer 2)   | Twisted Pair, Fiber Optic | Forwards frames based on MAC       |
++-------------------+-----------------------+---------------------------+------------------------------------+
+| Bridge            | Data Link (Layer 2)   | Twisted Pair, Fiber Optic | Connects two LAN segments, filters |
++-------------------+-----------------------+---------------------------+------------------------------------+
+| Router            | Network (Layer 3)     | Twisted Pair, Fiber Optic | Routes packets based on IP         |
++-------------------+-----------------------+---------------------------+------------------------------------+
+| Gateway           | Application / Network | Twisted Pair, Fiber Optic | Converts protocol, connects LAN/WAN|
++-------------------+-----------------------+---------------------------+------------------------------------+
+| Modem             | Physical / Data Link  | Coaxial, DSL, Fiber Optic | Converts digital to analog signal  |
++-------------------+-----------------------+---------------------------+------------------------------------+
+| Access Point      | Data Link / Network   | Wireless (Wi-Fi), Ethernet| Connects wireless clients to LAN   |
++-------------------+-----------------------+---------------------------+------------------------------------+
+| NIC (Network Card)| Physical / Data Link  | Twisted Pair, Fiber Optic | Connects device to network         |
++-------------------+-----------------------+---------------------------+------------------------------------+
+
++--------------------+-------------------------+---------------------------------+
+| Cable / Medium     | Max Speed / Bandwidth   | Typical Use                     |
++--------------------+-------------------------+---------------------------------+
+| Twisted Pair (Cat5)| 100 Mbps - 1 Gbps       | LAN connections, Ethernet       |
+| Twisted Pair (Cat6)| 1 Gbps - 10 Gbps        | High-speed Ethernet, LAN        |
+| Coaxial            | 10 Mbps - 10 Gbps       | Older Ethernet, TV networks     |
+| Fiber Optic        | 1 Gbps - 400 Gbps+      | Long-distance, WAN, data centers|
+| Wireless (Wi-Fi)   | 11 Mbps - 9.6 Gbps      | WLAN, mobile devices            |
+| Bluetooth          | 1 Mbps - 50 Mbps        | PAN, personal device connections|
+| DSL                | 1-100 Mbps              | Internet over telephone lines   |
+| Satellite          | 1-100 Mbps              | Long-distance WAN               |
++--------------------+-------------------------+---------------------------------+
+
+    Ethernet Straight-Through Cable - different types of devices
+    Ethernet Cross-Over Cable - same type of devices
+
+--------------------------------------------------------------
 
 1. Layering Basics
 --------------------------------------------------------------------
@@ -295,3 +354,1168 @@ Summary Table
 | Multiple Access (L2) | ALOHA, CSMA/CD, CSMA/CA,   | Medium access control     |
 |                      | FDMA, TDMA, CDMA            |                          |
 +----------------------+-----------------------------+--------------------------+
+
+COMPUTER NETWORKS – BLUETOOTH, WI-FI, ETHERNET
+==================================================
+
+1. BLUETOOTH
+-------------
+- Type: Wireless Personal Area Network (WPAN)
+- IEEE Standard: 802.15.1
+- Medium: Radio waves (2.4 GHz)
+- Range: Around 10 meters
+- Data Rate: 1 to 50 Mbps (depends on version)
+- Topology: Piconet or Scatternet
+- Protocols: L2CAP, RFCOMM, SDP, HCI
+- Security: Pairing, PIN code, Encryption
+- Power Usage: Very low
+- Use: Headphones, IoT devices, file sharing
+
+
+Piconet
+
+    A small network formed by 1 master device and up to 7 active slave devices.
+    The master controls communication and timing.
+    Example: Smartphone (master) connecting to 3 headphones and 2 smartwatches (slaves).
+    Additional slaves can be parked (inactive but synchronized).
+
+                 Master Device (M)
+                   |
+        -------------------------
+        |         |        |     |
+      Slave1    Slave2   Slave3  Slave4
+
+
+Scatternet
+
+    A larger network formed by interconnecting multiple piconets.
+    A device can be master in one piconet and slave in another.
+    Enables more devices to communicate over a wider area.
+    Example: Multiple Bluetooth devices in a smart home interconnected.
+
+        Piconet 1                     Piconet 2
+      Master1 (M1)                  Master2 (M2)
+         |                             |
+   -----------------             -----------------
+   |       |       |             |       |       |
+   S1      S2     S3*            S4      S5      S3*
+           \______________________________/
+                     (Bridge Device)
+
+Bluetooth Protocol Stack:
+
++-------------------------------------------------+
+|           OSI Layer 7 – Application             |
+|           Bluetooth: Application Layer          |
+|           (Profiles: A2DP, HFP, FTP, HID)       |
++-------------------------------------------------+
+|           OSI Layer 6 – Presentation            |
+|           (Handled by Application Layer for     |
+|            encoding/decoding if needed)         |
++-------------------------------------------------+
+|           OSI Layer 5 – Session                 |
+|           (Managed by RFCOMM for serial         |
+|            port sessions)                       |
++-------------------------------------------------+
+|           OSI Layer 4 – Transport               |
+|           (Mostly L2CAP provides multiplexing   |
+|            and segmentation)                    |
++-------------------------------------------------+
+|           OSI Layer 3 – Network                 |
+|           (Baseband & LMP handles addressing    |
+|            and device access control)           |
++-------------------------------------------------+
+|           OSI Layer 2 – Data Link               |
+|           (Baseband, LMP, L2CAP for reliable    |
+|            link and ACL/SCO links)              |
++-------------------------------------------------+
+|           OSI Layer 1 – Physical                |
+|           (Radio: 2.4 GHz ISM, FHSS)            |
++-------------------------------------------------+
+
+
+Bluesnarfing
+    Unauthorized access of data over Bluetooth.
+    Attacker can read contacts, messages, calendar from a device without permission.
+    Prevention: Keep Bluetooth off when not in use, use authentication, and avoid discoverable mode.
+
+Alternate Protocol – ZigBee
+    Standard: IEEE 802.15.4
+    Low-power, low-data-rate wireless communication.
+    Used in IoT devices, smart home sensors, and automation.
+    Supports mesh topology, which allows devices to relay messages.
+    Range: ~10–100 meters.
+
+--------------------------------------------------
+
+2. WI-FI
+---------
+- Type: Wireless Local Area Network (WLAN)
+- IEEE Standard: 802.11 (a/b/g/n/ac/ax)
+- Medium: Radio waves (2.4 GHz, 5 GHz, 6 GHz)
+- Range: Around 100 meters indoors
+- Data Rate: 11 Mbps to 9.6 Gbps
+- Topology: Star (via Access Point)
+- Protocol: CSMA/CA (Carrier Sense Multiple Access with Collision Avoidance)
+- Security: WPA2, WPA3
+- Use: Laptops, routers, smartphones, offices, homes
+
+--------------------------------------------------
+
+3. ETHERNET
+------------
+- Type: Wired Local Area Network (LAN)
+- IEEE Standard: 802.3
+- Medium: Twisted pair or fiber optic cables
+- Range: Up to 100 meters (Cat6)
+- Data Rate: 10 Mbps to 400 Gbps+
+- Topology: Star or Bus (via Switch/Hub)
+- Protocol: CSMA/CD (Carrier Sense Multiple Access with Collision Detection)
+- Security: VLANs, 802.1X
+- Use: PCs, servers, routers, data centers
+
+==================================================
+
+HOW WI-FI WORKS
+----------------
+Wi-Fi provides wireless internet connectivity using radio signals.
+It connects devices through an Access Point (AP).
+
+Steps:
+1. Device scans for Access Points (APs).
+2. Sends association request to AP.
+3. AP authenticates device (WPA2/WPA3).
+4. Device receives IP address (via DHCP).
+5. Data is sent using CSMA/CA protocol.
+6. Receiver sends ACK after successful data reception.
+
+--------------------------------------------------
+
+CSMA/CA PROTOCOL (Collision Avoidance)
+---------------------------------------
+1. Device senses channel (Clear Channel Assessment).
+2. If channel is busy, wait for random backoff time.
+3. If channel is free, transmit data.
+4. Receiver sends ACK.
+5. If no ACK received, retransmit after random delay.
+
+Purpose: To reduce collisions in shared wireless medium.
+
+--------------------------------------------------
+
+WI-FI ARCHITECTURE
+--------------------
+STA (Station) -> Access Point -> Router -> Internet
+
+Example:
+   [Laptop/Phone] --wireless--> [Access Point] --wired--> [Router] --> Internet
+
+Components:
+- STA: Client devices like phone, laptop.
+- AP: Connects wireless devices to network.
+- BSS: One AP + clients.
+- ESS: Multiple APs connected to cover large area.
+
+--------------------------------------------------
+
+HIDDEN TERMINAL PROBLEM
+------------------------
+When two stations cannot hear each other but both can reach the same Access Point.
+
+Diagram:
+
+   A -----> C <----- B
+
+A and B cannot detect each other.
+If A and B send data at the same time, collision occurs at C.
+
+Solution:
+Use RTS/CTS (Request to Send / Clear to Send) mechanism.
+
+Working:
+1. A sends RTS to AP (C).
+2. C replies with CTS.
+3. All stations hearing CTS stay silent until transmission completes.
+
+--------------------------------------------------
+
+EXPOSED TERMINAL PROBLEM
+-------------------------
+Occurs when a station unnecessarily stays silent even when it could transmit safely.
+
+Diagram:
+
+   A -----> B         C -----> D
+
+Here:
+- B can hear A and C.
+- D is only in range of C.
+- C senses A’s transmission and wrongly assumes channel is busy.
+- C waits instead of sending to D, reducing efficiency.
+
+Solution:
+Better carrier sensing or directional antennas.
+
+--------------------------------------------------
+
+WI-FI SECURITY PROTOCOLS
+-------------------------
+1. WEP (Wired Equivalent Privacy) – Weak, outdated.
+2. WPA (Wi-Fi Protected Access) – Moderate, uses TKIP.
+3. WPA2 – Strong, uses AES encryption.
+4. WPA3 – Latest, uses improved encryption and key management.
+
+--------------------------------------------------
+- Wi-Fi works on IEEE 802.11 standards.
+- Uses CSMA/CA for avoiding collisions.
+- Hidden and Exposed Terminal problems reduce efficiency.
+- RTS/CTS helps avoid collisions in wireless media.
+- Ethernet is faster and reliable but wired.
+- Bluetooth is for short-range, low-power communications.
+
+--------------------------------------------------
+
+VLAN
+
+    A VLAN (Virtual Local Area Network) allows you to partition a single physical switch into multiple logical networks.
+    Devices in the same VLAN can communicate directly.
+    Devices in different VLANs need a router or a Layer 3 device to communicate.
+
+    VLAN Tagging
+    When a frame travels across a trunk link (link carrying multiple VLANs), a VLAN tag is inserted in the Ethernet frame:
+    
+    | Dest MAC | Src MAC | VLAN Tag (12-bit VLAN ID) | EtherType | Payload | FCS |
+
+    VLAN ID identifies which VLAN the frame belongs to.
+    Trunk ports on switches carry frames of multiple VLANs using these tags.
+
+            +-------------------+
+            |      Router       |  <--- Inter-VLAN Routing
+            +-------------------+
+            | VLAN 10 | VLAN 20
+            |
+      Trunk Link (802.1Q)
+            |
+     +-------------------+
+     |      Switch       |
+     |-------------------|
+     | VLAN 10: Fa0/1    |--- PC1
+     | VLAN 20: Fa0/2    |--- PC2
+     +-------------------+
+    
+    PC1 in VLAN 10 can communicate with PC2 in VLAN 20 only through the router.
+    Frames between switches on trunk ports include 802.1Q VLAN tags.
+    This is virtual partitioning: one switch physically, but logically separated networks.
+
+-------------------------------------
+🌐 Broadcast Storm Problem & STP Solution
+-------------------------------------
+
+Problem:
+- In a network with redundant links, broadcast frames loop endlessly.
+- Each switch floods frames to all ports → causes a "Broadcast Storm".
+- Results:
+  • Network congestion
+  • High CPU usage
+  • Communication breakdown
+
+🔸 Without STP (Loop Present)
+      +-----------+
+      |  Switch A |
+      +-----------+
+       /         \
+      /           \
+ +-----------+   +-----------+
+ |  Switch B |---|  Switch C |
+ +-----------+   +-----------+
+     <--- Loop formed --->
+
+Broadcast packets keep circulating endlessly among A, B, and C.
+
+-------------------------------------
+🛠 Solution: STP (Spanning Tree Protocol)
+-------------------------------------
+- STP elects one Root Bridge (lowest Bridge ID).
+- Calculates best path to root and blocks redundant links.
+- Creates a loop-free logical topology.
+- If active path fails, STP reactivates the blocked link automatically.
+
+🔸 With STP Enabled (Loop-Free)
+      +-----------+
+      |  Switch A |   <- Root Bridge
+      +-----------+
+       /         \
+      /           \
+ +-----------+   +-----------+
+ |  Switch B |   |  Switch C |
+ +-----------+   +-----------+
+        \___________/
+         (Blocked Port by STP)
+
+✅ Result:
+- No loops → No broadcast storms
+- Redundancy preserved (backup link auto-enabled on failure)
+
+-------------------------------------
+⚙️ Basic STP Commands (Cisco Example)
+-------------------------------------
+Switch(config)# spanning-tree mode pvst
+Switch(config)# spanning-tree vlan 1 priority 4096
+Switch(config)# show spanning-tree
+
+
+--------------------------------------------
+🌐 IP Address (Network Layer) - Quick Notes
+--------------------------------------------
+
+1️⃣ Definition:
+An IP address uniquely identifies a device on a network.
+It works at the Network Layer (Layer 3) of the OSI model.
+
+Example: 192.168.1.10
+
+--------------------------------------------
+2️⃣ Need for IP Address:
+- Provides unique identification for devices.
+- Enables routing of packets between different networks.
+- Acts like a “postal address” for communication across the Internet.
+
+--------------------------------------------
+3️⃣ IPv4 Address Structure:
+- 32-bit logical address divided into 4 octets.
+- Written in dotted decimal format: A.B.C.D
+  Example: 192.168.1.1
+- Binary form: 11000000.10101000.00000001.00000001
+- limit 0 to 255.
+
+Each octet → 8 bits → 0–255 range
+
+--------------------------------------------
+4️⃣ IPv4 Address Classes:
+Class A: 1.0.0.0   – 126.255.255.255  (Large networks)
+Class B: 128.0.0.0 – 191.255.255.255  (Medium networks)
+Class C: 192.0.0.0 – 223.255.255.255  (Small networks)
+
+--------------------------------------------
+5️⃣ Private and Public IP Addresses:
+Private IP → Used inside LAN (not routable on Internet)
+  Class A: 10.0.0.0 – 10.255.255.255
+  Class B: 172.16.0.0 – 172.31.255.255
+  Class C: 192.168.0.0 – 192.168.255.255
+
+Public IP → Unique and routable over the Internet.
+Assigned by ISP or IANA.
+
+--------------------------------------------
+6️⃣ Uniqueness:
+Each public IP must be unique across the entire Internet.
+
+--------------------------------------------
+7️⃣ NAT (Network Address Translation):
+- Converts private IP addresses to a public IP before sending data to the Internet.
+- Allows multiple devices to share a single public IP.
+- Conserves IPv4 addresses.
+
+Example:
+Private: 192.168.1.10 → NAT Router → Public: 103.25.60.8
+
+--------------------------------------------
+8️⃣ IPv4 Address Representation:
+Decimal: 192.168.1.10
+Binary:  11000000.10101000.00000001.00001010
+
+
+# ---------------------------
+# 🌐 IPv4 Address Classes & Subnet Mask
+# ---------------------------
+
+## Subnet Mask:
+- A 32-bit number that divides an IP address into network and host portions.
+- Helps routers determine if a destination IP is within the same network or requires routing.
+
+## IPv4 Address Classes:
+
+| Class | 1st Octet Range | Binary Prefix | Network Bits | Host Bits | Default Subnet Mask | Networks | Hosts per Network |
+|-------|-----------------|---------------|--------------|-----------|---------------------|----------|-------------------|
+| A     | 1–126           | 0xxxxxxx      | 8            | 24        | 255.0.0.0           | 128      | 16,777,214        |
+| B     | 128–191         | 10xxxxxx      | 16           | 16        | 255.255.0.0         | 16,384   | 65,534            |
+| C     | 192–223         | 110xxxxx      | 24           | 8         | 255.255.255.0       | 2,097,152| 254               |
+| D     | 224–239         | 1110xxxx      | N/A          | N/A       | N/A                 | N/A      | N/A               |
+| E     | 240–255         | 1111xxxx      | N/A          | N/A       | N/A                 | N/A      | N/A               |
+
+Note:
+- **Class A**: Suitable for large networks (e.g., ISPs).
+- **Class B**: Suitable for medium-sized networks (e.g., universities).
+- **Class C**: Suitable for small networks (e.g., small businesses).
+- **Class D**: Reserved for multicast addresses.
+- **Class E**: Reserved for experimental purposes.
+
+## Example:
+- IP Address: `192.168.1.10`
+- Class: C
+- Default Subnet Mask: `255.255.255.0`
+- Network Portion: `192.168.1`
+- Host Portion: `10`
+
+--------------------------------------------
+🌐 Subnet Mask – Concept & Communication Logic
+--------------------------------------------
+
+1️⃣ What is a Subnet Mask?
+- A 32-bit number used to separate the Network and Host portions of an IP address.
+- Determines which IPs belong to the same network (can communicate directly).
+- Example formats:
+  • 255.0.0.0       → /8  (Class A)
+  • 255.255.0.0     → /16 (Class B)
+  • 255.255.255.0   → /24 (Class C)
+
+  🧩 CIDR Notation (Classless Inter-Domain Routing)
+        CIDR uses a slash ( / ) followed by a number to indicate how many bits of the IP address are part of the network portion.
+        The first 24 bits are the network part.
+        Remaining 8 bits are for hosts.
+
+        | CIDR | Subnet Mask   | Network Bits | Host Bits | Total IPs  | Usable Hosts |
+        | ---- | ------------- | ------------ | --------- | ---------- | ------------ |
+        | /8   | 255.0.0.0     | 8            | 24        | 16,777,216 | 16,777,214   |
+        | /12  | 255.240.0.0   | 12           | 20        | 1,048,576  | 1,048,574    |
+        | /16  | 255.255.0.0   | 16           | 16        | 65,536     | 65,534       |
+        | /24  | 255.255.255.0 | 24           | 8         | 256        | 254          |
+
+
+--------------------------------------------
+2️⃣ How Subnet Mask Works:
+- Bitwise AND between IP address and subnet mask gives the **Network Address**.
+- Devices with the **same network address** can communicate directly (same LAN/switch).
+- If network address differs → needs a router for communication.
+
+--------------------------------------------
+3️⃣ Example 1 (Possible Communication)
+IP1:  192.168.1.10
+IP2:  192.168.1.20
+Mask: 255.255.255.0 (/24)
+
+Network for IP1 = 192.168.1.0
+Network for IP2 = 192.168.1.0
+✅ Same network → communication possible under one switch.
+
+--------------------------------------------
+4️⃣ Example 2 (Not Possible Without Router)
+IP1:  192.168.1.10
+IP2:  192.168.2.10
+Mask: 255.255.255.0 (/24)
+
+Network for IP1 = 192.168.1.0
+Network for IP2 = 192.168.2.0
+❌ Different networks → need router for communication.
+
+--------------------------------------------
+5️⃣ Example 3 (Broad Mask, Communication Possible)
+IP1:  1.12.12.1
+IP2:  1.12.13.1
+Mask: 255.255.0.0 (/16)
+
+Network for both = 1.12.0.0
+✅ Same network → can communicate directly (under one switch).
+
+--------------------------------------------
+6️⃣ Example 4 (Narrow Mask, Communication Not Possible)
+IP1:  1.12.12.1
+IP2:  1.12.13.1
+Mask: 255.255.255.0 (/24)
+
+Network for IP1 = 1.12.12.0
+Network for IP2 = 1.12.13.0
+❌ Different networks → router needed.
+
+--------------------------------------------
+🧠 Quick Rule:
+If (IP1 & Mask) == (IP2 & Mask)
+→ Same network → communication possible under one switch
+Else
+→ Different network → router required
+
+--------------------------------------------
+🌐 Unicast, Broadcast & Multicast in IPv4
+--------------------------------------------
+
+1️⃣ Unicast:
+- One-to-one communication.
+- A single sender communicates with a single receiver.
+- Most Internet traffic is unicast (e.g., web browsing, SSH, file transfer).
+
+Example:
+Host A (192.168.1.10) → Host B (192.168.1.20)
+✅ Only Host B receives the packet.
+
+Address Range:
+Class A, B, C unicast IPs (e.g., 1.0.0.1 to 223.255.255.254)
+
+--------------------------------------------
+2️⃣ Broadcast:
+- One-to-all communication in the same network.
+- Message sent to all hosts in that subnet (local network only).
+
+Types:
+- **Directed Broadcast:** Sent to all hosts in a specific network.
+  Example: 192.168.1.255 → all devices in 192.168.1.0/24
+- **Limited Broadcast:** Sent to all hosts in the local network.
+  Example: 255.255.255.255 → not forwarded by routers.
+
+✅ Used for ARP requests, DHCP discovery, etc.
+
+--------------------------------------------
+3️⃣ Multicast:
+- One-to-many communication.
+- Used to send packets to a group of interested receivers.
+- Reduces network load compared to broadcast.
+
+Address Range:
+224.0.0.0 to 239.255.255.255 (Class D)
+
+Example:
+A live video stream → multiple subscribed users.
+
+--------------------------------------------
+4️⃣ Reserved Addresses (0 and 255)
+- In any network, first and last IPs are **reserved**:
+
+  • Network Address → All host bits = 0  
+    → Identifies the network itself.
+    Example: 192.168.1.0 (for /24 network)
+
+  • Broadcast Address → All host bits = 1  
+    → Used to send to all hosts in that subnet.
+    Example: 192.168.1.255 (for /24 network)
+
+--------------------------------------------
+5️⃣ Quick Summary Table
+
+| Type        | Communication  | Example Address        | Forwarded by Router | Used For               |
+|-------------|----------------|------------------------|---------------------|------------------------|
+| Unicast     | One-to-One     | 192.168.1.10           | Yes                 | Normal host traffic    |
+| Broadcast   | One-to-All     | 255.255.255.255 / .255 | No                  | DHCP, ARP              |
+| Multicast   | One-to-Many    | 224.0.0.1              | Yes (special setup) | Streaming, Routing Info|
+| Network ID  | Identifier     | 192.168.1.0            | N/A                 | Network Identification |
+| Broadcast ID| All hosts      | 192.168.1.255          | No                  | Local broadcast        |
+
+--------------------------------------------
+🧠 Key Points:
+- Network ID (host bits = 0) → cannot assign to devices.
+- Broadcast ID (host bits = 1) → cannot assign to devices.
+- Routers forward unicast & multicast, but **not broadcast**.
+
++-------------------+------------------------------+----------------------------+
+| Type              | Use Case                     | Example                    |
++-------------------+------------------------------+----------------------------+
+| Network ID        | Identifies the network       | 192.168.1.0 (/24)          |
+| Broadcast         | Message to all hosts in net  | 192.168.1.255 (/24)        |
+| Loopback          | Test own device (self ping)  | 127.0.0.1                  |
+| Link-Local (APIPA)| Auto IP when DHCP fails      | 169.254.x.x                |
+| Test-Net          | Used in docs/examples        | 192.0.2.0/24               |
+| Experimental      | Reserved for future use      | 240.0.0.0 – 255.255.255.254|
+| Global Broadcast  | Broadcast to all locally     | 255.255.255.255            |
++-------------------+------------------------------+----------------------------+
+
+--------------------------------------------
+🌐 Public & Private IPs, NAT & ISP – Quick Notes
+--------------------------------------------
+
+1️⃣ Public IP Address:
+- Unique across the entire Internet.
+- Assigned by your ISP.
+- Used for direct communication over the Internet.
+- Example: 103.25.60.8
+
+2️⃣ Private IP Address:
+- Used inside a private network (LAN).
+- Not routable on the Internet.
+- Example ranges:
+  • 10.0.0.0 – 10.255.255.255 (/8)
+  • 172.16.0.0 – 172.31.255.255 (/12)
+  • 192.168.0.0 – 192.168.255.255 (/16)
+- Example: 12.12.12.3
+
+3️⃣ NAT (Network Address Translation):
+- Converts private IPs to a public IP for Internet access.
+- Works on a router/firewall.
+- Types:
+  • Static NAT → 1-to-1 mapping
+  • Dynamic NAT → many-to-many mapping
+  • PAT (Port Address Translation) → many-to-1 mapping using ports
+
+4️⃣ How NAT Works:
+- Private IP sends request → Router replaces source IP with **public IP** + port.
+- Router keeps a NAT table mapping:
+  | Private IP:Port | Public IP:Port |
+- Incoming response from Internet uses public IP:port → Router forwards to correct private IP.
+
+5️⃣ ISP (Internet Service Provider):
+- Provides Internet access and public IP addresses.
+- Routes traffic between your network and the Internet.
+- Assigns a public IP to your NAT router.
+
+6️⃣ Example Communication (Private IP → Google):
+- Your device: 12.12.12.3 requests google.com
+- Steps:
+  1. Device sends packet to router: src=12.12.12.3 dst=142.250.190.14
+  2. Router performs NAT:
+     - Replaces src IP with public IP (e.g., 103.25.60.8)
+     - Adds source port number for tracking
+     - Saves mapping: 12.12.12.3:5000 → 103.25.60.8:40000
+  3. Packet goes to ISP → Internet → Google
+  4. Google replies to 103.25.60.8:40000
+  5. Router checks NAT table → forwards packet to 12.12.12.3:5000
+- ✅ Result: Your private IP can communicate with Internet safely.
+
+7️⃣ Key Points:
+- Private IPs are unique **only inside LAN**.
+- Public IPs are globally unique.
+- NAT allows multiple devices to share **one public IP**.
+- Routers and NAT handle all mapping automatically.
+
+
+--------------------------------------------
+🌐 Firewall – Quick Notes
+--------------------------------------------
+
+1️⃣ Definition:
+- A firewall is a network security device or software that **monitors and controls incoming and outgoing network traffic** based on predefined security rules.
+- Acts as a barrier between a trusted internal network (LAN) and untrusted external networks (Internet).
+
+2️⃣ Purpose:
+- Protects network from unauthorized access, attacks, or malware.
+- Allows legitimate traffic while blocking malicious or unwanted traffic.
+- Can filter traffic based on:
+  • IP addresses
+  • Ports
+  • Protocols
+  • Applications
+
+3️⃣ Types of Firewalls:
+- **Packet Filtering Firewall**: Checks packets at network layer; allows or blocks based on IP/port.
+- **Stateful Firewall**: Tracks active connections; allows only legitimate packets part of an established session.
+- **Application Firewall**: Filters traffic at application layer; blocks specific applications or content.
+- **Next-Generation Firewall (NGFW)**: Combines stateful, application-level filtering, intrusion prevention, and more.
+
+4️⃣ How Firewall Works:
+- Traffic enters firewall → Firewall checks rules → Permits or denies packet → Logs the activity.
+- Can be implemented as **hardware device** (between network and Internet) or **software** (on servers or endpoints).
+
+5️⃣ Key Use-Cases:
+- Block unauthorized access from Internet.
+- Allow specific services (HTTP, HTTPS, SSH) only.
+- Prevent malware or DoS attacks.
+- Segment network zones for security.
+
+6️⃣ Example:
+- Internal device 192.168.1.10 wants to access web (port 80)
+- Firewall rule: Allow TCP 80 → Packet forwarded
+- External attacker tries to access 192.168.1.10 on port 22 → Rule: Deny → Packet dropped
+
+
+--------------------------------------------
+🌐 Classful vs Classless Addressing
+--------------------------------------------
+
+1️⃣ Drawbacks of Classful Addressing:
+- **Fixed Network Sizes**: Class A, B, C have fixed number of hosts. Wastes IPs.
+  • Example: A small company with 300 hosts → Class B gives 65,534 addresses → huge waste
+- **IP Address Exhaustion**: Large unused address blocks deplete IPv4 space quickly.
+- **Inefficient Allocation**: Cannot create subnet smaller than class size → inefficient use of address space.
+- **Inflexible**: Cannot easily divide networks into custom sizes.
+- **Limited Scalability**: Difficult to adapt to changing network needs.
+
+2️⃣ Need for Classless Addressing (CIDR):
+- **Variable-Length Subnet Mask (VLSM)**: Allocate IPs based on actual need, not fixed class.
+- **Efficient IP Utilization**: Reduces wastage of IP addresses.
+- **Supports Hierarchical Routing**: Aggregation of routes reduces routing table size (supernetting).
+- **Scalable & Flexible**: Easier to manage networks of any size.
+- **Example:** 192.168.1.0/25 → 128 addresses (instead of default Class C 256)
+
+3️⃣ Summary:
+- Classful addressing → simple but inefficient and rigid
+- Classless (CIDR) → flexible, efficient, scalable, avoids IPv4 exhaustion
+
+--------------------------------------------
+🌐 IPv4 Classes, Addressing & Subnetting
+--------------------------------------------
+
+1️⃣ **IPv4 Address Classes**
+| Class | 1st Octet Range | Default Subnet Mask | Network Bits | Host Bits | Hosts per Network |
+|-------|-----------------|------------------|-------------|-----------|-----------------|
+| A     | 1–126           | 255.0.0.0        | 8           | 24        | 16,777,214      |
+| B     | 128–191         | 255.255.0.0      | 16          | 16        | 65,534          |
+| C     | 192–223         | 255.255.255.0    | 24          | 8         | 254             |
+| D     | 224–239         | N/A              | N/A         | N/A       | Multicast       |
+| E     | 240–255         | N/A              | N/A         | N/A       | Experimental    |
+
+---
+
+2️⃣ **Subnetting**
+- Dividing a network into smaller sub-networks (subnets) to efficiently use IPs.
+- Subnet mask determines network and host portions.
+- Formula:
+  • Number of subnets = 2^n  (n = borrowed bits from host portion)
+  • Hosts per subnet = 2^h - 2  (h = remaining host bits)
+
+---
+
+3️⃣ **Subnetting Chart (for /24 network)**
+| Subnet Mask     | CIDR  | # of Subnets | Hosts per Subnet | Example Network          |
+|-----------------|-------|--------------|-----------------|---------------------------|
+| 255.255.255.128 | /25   | 2            | 126             | 192.168.1.0, 192.168.1.128|
+| 255.255.255.192 | /26   | 4            | 62              | 192.168.1.0, 64, 128, 192 |
+| 255.255.255.224 | /27   | 8            | 30              | 192.168.1.0, 32, 64…224   |
+| 255.255.255.240 | /28   | 16           | 14              | 192.168.1.0, 16, 32…240   |
+| 255.255.255.248 | /29   | 32           | 6               | 192.168.1.0, 8, 16…248    |
+| 255.255.255.252 | /30   | 64           | 2               | 192.168.1.0, 4, 8…252     |
+
+---
+
+✅ **Key Points**
+- Borrow host bits to create subnets as needed.
+- First subnet IP = network ID, last IP = broadcast.
+- Efficiently uses IP addresses and improves routing.
+
+--------------------------------------------
+🌐 IPv4 Subnetting Chart (/1 to /32)
+--------------------------------------------
+
+| CIDR | Subnet Mask     | Hosts/Subnet | CIDR | Subnet Mask     | Hosts/Subnet |
+|------|-----------------|--------------|------|-----------------|--------------|
+| /1   | 128.0.0.0       | 1,073,741,822| /17  | 255.255.128.0   | 32,766       |
+| /2   | 192.0.0.0       | 536,870,910  | /18  | 255.255.192.0   | 16,382       |
+| /3   | 224.0.0.0       | 268,435,454  | /19  | 255.255.224.0   | 8,190        |
+| /4   | 240.0.0.0       | 134,217,726  | /20  | 255.255.240.0   | 4,094        |
+| /5   | 248.0.0.0       | 67,108,862   | /21  | 255.255.248.0   | 2,046        |
+| /6   | 252.0.0.0       | 33,554,430   | /22  | 255.255.252.0   | 1,022        |
+| /7   | 254.0.0.0       | 16,777,214   | /23  | 255.255.254.0   | 510          |
+| /8   | 255.0.0.0       | 16,777,214   | /24  | 255.255.255.0   | 254          |
+| /9   | 255.128.0.0     | 8,388,606    | /25  | 255.255.255.128 | 126          |
+| /10  | 255.192.0.0     | 4,194,302    | /26  | 255.255.255.192 | 62           |
+| /11  | 255.224.0.0     | 2,097,150    | /27  | 255.255.255.224 | 30           |
+| /12  | 255.240.0.0     | 1,048,574    | /28  | 255.255.255.240 | 14           |
+| /13  | 255.248.0.0     | 524,286      | /29  | 255.255.255.248 | 6            |
+| /14  | 255.252.0.0     | 262,142      | /30  | 255.255.255.252 | 2            |
+| /15  | 255.254.0.0     | 131,070      | /31  | 255.255.255.254 | 0            |
+| /16  | 255.255.0.0     | 65,534       | /32  | 255.255.255.255 | 1            |
+
+--------------------------------------------
+🧠 Notes:
+- Hosts/Subnet = 2^(32 - CIDR) - 2 (except /31 and /32)
+- /31 → point-to-point links, /32 → single host
+3. **Valid Subnet Masks Rule:**  
+   - Must have **consecutive 1’s** (network bits) followed by **consecutive 0’s** (host bits).  
+   - Example: 255.255.255.0 (/24) → valid  
+   - Example: 255.255.0.255 → INVALID (1’s and 0’s not consecutive)
+
+--------------------------------------------
+🌐 Subnetting Example: Divide 192.168.14.0/24 into 2 subnets
+--------------------------------------------
+
+1️⃣ Given:
+- Original Network: 192.168.14.0
+- Class: C (/24)
+- Subnet Mask: 255.255.255.0
+- Total Hosts in /24: 2^(32-24)-2 = 254 hosts
+- Goal: Divide into 2 equal subnets → Borrow 1 bit from host portion
+- New Subnet Mask: 255.255.255.128 (/25)
+- Hosts per subnet: 2^(32-25)-2 = 126 hosts
+
+2️⃣ Step 1: First Subnet
+- Network ID: 192.168.14.0 (/25)
+- Host Range: 192.168.14.1 → 192.168.14.126
+- Broadcast Address: 192.168.14.127
+
+3️⃣ Step 2: Second Subnet
+- Network ID: 192.168.14.128 (/25)
+- Host Range: 192.168.14.129 → 192.168.14.254
+- Broadcast Address: 192.168.14.255
+
+--------------------------------------------
+📊 Summary Table
+
+| Subnet | Network ID       | First Host       | Last Host        | Broadcast       |
+|--------|-----------------|----------------|----------------|----------------|
+| 1      | 192.168.14.0    | 192.168.14.1   | 192.168.14.126 | 192.168.14.127 |
+| 2      | 192.168.14.128  | 192.168.14.129 | 192.168.14.254 | 192.168.14.255 |
+
+--------------------------------------------
+
+--------------------------------------------
+🌐 FLSM vs VLSM (Subnetting Methods)
+--------------------------------------------
+
+1️⃣ FLSM — Fixed Length Subnet Mask
+--------------------------------------------
+📘 Definition:
+- All subnets use the **same subnet mask** (same number of hosts per subnet).
+- Easier to manage, but may **waste IP addresses**.
+
+📗 Key Points:
+- Equal-sized subnets.
+- Simple and uniform.
+- Used in older or simple networks (e.g., RIP v1).
+
+📊 Example:
+Network: 192.168.10.0/24
+Need 4 equal subnets → borrow 2 bits (/26)
+
+Each subnet (/26 = 255.255.255.192) → 64 IPs (62 usable)
+
+| Subnet | Network ID      | Host Range           | Broadcast      |
+|--------|-----------------|----------------------|----------------|
+| 1      | 192.168.10.0    | 192.168.10.1–62      | 192.168.10.63  |
+| 2      | 192.168.10.64   | 192.168.10.65–126    | 192.168.10.127 |
+| 3      | 192.168.10.128  | 192.168.10.129–190   | 192.168.10.191 |
+| 4      | 192.168.10.192  | 192.168.10.193–254   | 192.168.10.255 |
+
+🖼 Diagram:
+192.168.10.0/24
++---------+---------+---------+---------+
+| /26     | /26     | /26     | /26     |
+| 0–63    | 64–127  | 128–191 | 192–255 |
++---------+---------+---------+---------+
+
+✅ Easy but wasteful if host requirements differ.
+
+--------------------------------------------
+2️⃣ VLSM — Variable Length Subnet Mask
+--------------------------------------------
+📘 Definition:
+- Allows **different subnet masks** for different subnets.
+- Allocates IPs efficiently based on host requirement.
+- Used in modern routing (RIP v2, OSPF, EIGRP, etc.)
+
+📗 Key Points:
+- Different-sized subnets.
+- Saves IP addresses.
+- Requires careful planning.
+
+📊 Example:
+Network: 192.168.1.0/24
+Requirements:
+- Subnet A → 100 hosts
+- Subnet B → 50 hosts
+- Subnet C → 25 hosts
+- Subnet D → 10 hosts
+
+📐 Step 1: Assign largest first
+- A: /25 → 126 hosts → 192.168.1.0 – 192.168.1.127
+- B: /26 → 62 hosts → 192.168.1.128 – 192.168.1.191
+- C: /27 → 30 hosts → 192.168.1.192 – 192.168.1.223
+- D: /28 → 14 hosts → 192.168.1.224 – 192.168.1.239
+
+🖼 Diagram:
+192.168.1.0/24
++-----------+--------+-------+-------+
+| /25 (A)   | /26(B) | /27(C)|/28(D) |
+| 0–127     |128–191 |192–223|224–239|
++-----------+--------+-------+-------+
+
+✅ Saves IPs by using variable masks per subnet.
+
+--------------------------------------------
+🧠 Summary Table
+
+| Feature           | FLSM                    | VLSM                     |
+|-------------------|-------------------------|--------------------------|
+| Subnet Mask       | Same for all subnets    | Different per subnet     |
+| Efficiency         | Less efficient (wastage)| Highly efficient         |
+| Complexity        | Simple                  | Complex planning needed  |
+| Use Case          | Small/simple networks   | Large modern networks    |
+| Supported By      | RIP v1 (no CIDR)        | RIP v2, OSPF, EIGRP, BGP |
+
+--------------------------------------------
+✅ Conclusion:
+Use **VLSM** for modern, efficient IP management —  
+assign only as many IPs as each subnet actually needs.
+
+--------------------------------------------
+🌐 IPv6 – Internet Protocol version 6
+--------------------------------------------
+
+📘 Definition:
+IPv6 is the **next-generation Internet Protocol** designed to replace IPv4,
+providing a much larger address space and improved network efficiency.
+
+--------------------------------------------
+🔹 IPv6 Address Structure:
+- 128 bits (vs 32 bits in IPv4)
+- Written as **8 groups** of 4 hexadecimal digits, separated by colons (:)
+  Example: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+- Can be shortened by:
+  - Removing leading zeros: 2001:db8:85a3:0:0:8a2e:370:7334
+  - Replacing consecutive zeros with "::" (only once): 2001:db8:85a3::8a2e:370:7334
+
+--------------------------------------------
+🔹 IPv6 Validation Rules:
+✅ 8 groups of hex digits (0–9, a–f)
+✅ Groups separated by colons (:)
+✅ "::" allowed only once to represent one or more groups of 0000
+✅ Max length = 39 characters
+✅ Example (Valid): 2001:0db8::1
+❌ Example (Invalid): 2001:::1 (multiple "::")
+
+--------------------------------------------
+🔹 Drawbacks of IPv4 (why IPv6 was needed):
+1. Limited address space (only ~4.3 billion)
+2. Requires NAT for private IPs
+3. Manual configuration and fragmentation
+4. Lacks built-in security and auto-configuration
+5. Network growth became difficult
+
+--------------------------------------------
+🔹 Advantages of IPv6:
+✅ 128-bit addressing → virtually unlimited addresses  
+✅ No need for NAT → end-to-end connectivity  
+✅ Built-in IPsec security  
+✅ Auto-configuration (stateless address config)  
+✅ Efficient routing & better QoS  
+✅ Simplified packet header  
+
+--------------------------------------------
+📊 Comparison Summary:
+
+| Feature          | IPv4               | IPv6                       |
+|------------------|--------------------|-----------------------------|
+| Address Size     | 32-bit             | 128-bit                    |
+| Notation         | Dotted decimal     | Hexadecimal with colons     |
+| Total Addresses  | ~4.3 billion       | 3.4 × 10³⁸ (virtually infinite) |
+| NAT Required     | Yes                | No                          |
+| Security (IPsec) | Optional           | Built-in                    |
+| Config Method    | Manual/DHCP        | Auto/DHCPv6                 |
+
+--------------------------------------------
+🧠 Tip:
+IPv6 allows every device to have a **unique global IP**, 
+removing the need for private-public translation.
+
+--------------------------------------------
+🌐 NAT – Network Address Translation
+--------------------------------------------
+
+📘 Definition:
+NAT is a technique used by routers to **translate private IP addresses** 
+(from internal network) into **public IP addresses** (used on the Internet),
+and vice versa.
+
+--------------------------------------------
+🔹 Why NAT is Needed:
+- IPv4 has limited addresses (only ~4.3 billion).
+- Private IPs (e.g., 192.168.x.x) are **not routable** on the Internet.
+- NAT lets multiple private devices share **one public IP**.
+
+--------------------------------------------
+🔹 How NAT Works:
+1️⃣ A device inside LAN (e.g., 192.168.1.10) sends a request to the Internet.
+2️⃣ The router replaces the private IP with its public IP (e.g., 122.176.8.5)
+    and keeps a mapping in its NAT table.
+3️⃣ The external server (like google.com) replies to the router’s public IP.
+4️⃣ Router looks up the mapping and forwards the response to the correct private IP.
+
+--------------------------------------------
+🧩 Example:
+Private network:
+  PC1 → 192.168.1.10
+  PC2 → 192.168.1.11
+Router → Public IP: 122.176.8.5
+
+When both PCs access google.com:
+| Private IP     | Public IP (Router) | Port Mapping |
+|----------------|-------------------|---------------|
+| 192.168.1.10   | 122.176.8.5:3001  | NAT Table     |
+| 192.168.1.11   | 122.176.8.5:3002  | NAT Table     |
+
+--------------------------------------------
+🔹 Types of NAT:
+1. **Static NAT** → One private IP ↔ One public IP (1:1 mapping)
+2. **Dynamic NAT** → Private IPs mapped to available public IPs from a pool
+3. **PAT (Port Address Translation)** / **Overloading** → 
+   Many private IPs share one public IP using **different port numbers** (most common)
+
+--------------------------------------------
+🔹 Advantages:
+✅ Conserves public IPv4 addresses  
+✅ Provides basic network security (hides internal IPs)  
+✅ Allows multiple devices to use one public IP  
+
+--------------------------------------------
+🔹 Disadvantages:
+❌ Breaks true end-to-end connectivity  
+❌ Slows down communication (translation overhead)  
+❌ Some applications (e.g., VoIP, gaming) may face issues  
+
+--------------------------------------------
+🧠 Summary:
+NAT = A translator at the router that lets private devices talk to the Internet 
+by temporarily using the router’s public IP.
+
+--------------------------------------------
+🔗 ARP – Address Resolution Protocol
+--------------------------------------------
+
+📘 Definition:
+ARP is a protocol used to **map an IP address to its corresponding MAC address**
+within a local network (LAN).
+
+--------------------------------------------
+🔹 Why ARP is Needed:
+- Devices communicate at the **Data Link Layer (Layer 2)** using MAC addresses.
+- IP works at the **Network Layer (Layer 3)**.
+- ARP connects these two layers by finding which **MAC address** belongs to a given **IP**.
+
+--------------------------------------------
+🔹 How ARP Works:
+1️⃣ A device wants to send data to another IP (e.g., 192.168.1.5).
+2️⃣ It checks its **ARP cache** for the MAC address.
+3️⃣ If not found → it sends an **ARP Request (broadcast)**:
+   "Who has 192.168.1.5? Tell 192.168.1.2"
+4️⃣ The device with IP 192.168.1.5 replies with its **MAC address**.
+5️⃣ The sender stores this IP–MAC mapping in its **ARP table** for future use.
+
+--------------------------------------------
+🧩 Example:
+
+Host A (192.168.1.2, MAC A1)
+Host B (192.168.1.5, MAC B1)
+
+Host A → sends ARP Request (broadcast):
+  "Who has 192.168.1.5?"
+
+Host B → sends ARP Reply (unicast):
+  "192.168.1.5 is at B1"
+
+📘 ARP Table (after communication)
+| IP Address    | MAC Address | Type   |
+|---------------|-------------|--------|
+| 192.168.1.5   | B1          | Dynamic|
+
+--------------------------------------------
+🖼 Diagram:
+
++-------------+           +-------------+
+| Host A      |  -------> | Broadcast   |
+| 192.168.1.2 |           | Who has 192.168.1.5? |
++-------------+           +-------------+
+          <----------------
+           ARP Reply: MAC = B1
+
+--------------------------------------------
+🔹 Types of ARP:
+1. **Normal ARP** → Find MAC for known IP
+2. **Gratuitous ARP** → Device announces its IP–MAC mapping
+3. **Proxy ARP** → Router answers ARP requests on behalf of another device
+4. **Reverse ARP (RARP)** → Finds IP from a known MAC (opposite of ARP)
+
+--------------------------------------------
+🔹 Advantages:
+✅ Enables communication in LAN using IP  
+✅ Reduces manual MAC configuration  
+✅ Auto-learns and caches addresses  
+
+--------------------------------------------
+🔹 Disadvantages:
+❌ Can be exploited (ARP spoofing/poisoning)  
+❌ Works only in local network  
+
+--------------------------------------------
+🧠 Summary:
+ARP = Resolves IP → MAC inside a LAN  
+Used so devices can send Ethernet frames to the correct destination.
+
+--------------------------------------------
+🚦 Routing Algorithms – Computer Networks
+--------------------------------------------
+
+📘 Definition:
+Routing algorithms are used by routers to **determine the best path**
+for data packets to travel from **source to destination** in a network.
+
+--------------------------------------------
+🔹 Types of Routing
+1️⃣ **Static Routing**
+   - Routes are manually configured by the network admin.
+   - Does not change automatically if network topology changes.
+   ✅ Simple and secure
+   ❌ Not scalable
+
+2️⃣ **Dynamic Routing**
+   - Routers automatically learn and update routes using routing protocols.
+   - Uses routing algorithms to find best path.
+   ✅ Scalable and adaptive
+   ❌ More complex, uses CPU and bandwidth
+
+--------------------------------------------
+🔹 Routing Algorithm Categories
+
+1️⃣ **Distance Vector Routing**
+   - Each router knows distance (hop count) to reach every network.
+   - Routers exchange routing tables periodically with neighbors.
+   - Example Protocols: RIP, BGP (partially)
+   - Algorithm: Bellman-Ford
+
+   🧩 Example:
+   Router A → B = 1 hop  
+   Router A → C (via B) = 2 hops  
+
+   📘 Features:
+   - Simple
+   - Slow convergence
+   - May cause routing loops (uses split horizon, hold-down timers)
+
+--------------------------------------------
+2️⃣ **Link State Routing**
+   - Each router knows the full network topology.
+   - Routers flood link-state information to all others.
+   - Each router builds a complete map and runs **Dijkstra’s Algorithm**.
+   - Example Protocols: OSPF, IS-IS
+
+   📘 Features:
+   - Fast convergence
+   - No loops
+   - Requires more memory and CPU
+
+--------------------------------------------
+3️⃣ **Hybrid Routing**
+   - Combines both Distance Vector + Link State features.
+   - Example Protocol: EIGRP (Cisco)
+   - Balances efficiency and stability.
+
+--------------------------------------------
+🧠 Example: Path Finding Comparison
+
+Network:
+A ---- B ---- C ---- D
+
+Distance Vector → Chooses path with fewest hops  
+Link State → Chooses path with least cost/weight (based on bandwidth or delay)
+
+--------------------------------------------
+📊 Comparison Table
+
+| Type            | Algorithm       | Example | Info Shared           | Convergence | Loops | Complexity |
+|-----------------|-----------------|----------|------------------------|-------------|-------|-------------|
+| Distance Vector | Bellman-Ford    | RIP      | To neighbors only      | Slow        | Possible | Low         |
+| Link State      | Dijkstra        | OSPF     | To all routers         | Fast        | No    | High        |
+| Hybrid          | Mixed           | EIGRP    | Partial updates        | Medium      | Rare  | Medium      |
+
+--------------------------------------------
+🔹 Key Routing Metrics:
+- Hop Count
+- Bandwidth
+- Delay
+- Reliability
+- Load
+Routers select the **best path (lowest cost)** based on these metrics.
+
+--------------------------------------------
+✅ Summary:
+Routing algorithms help routers decide:
+➡ Which path to forward packets
+➡ How to adapt to network changes
+➡ Maintain efficient and loop-free communication
+
+Distance Vector → Simpler  
+Link State → Smarter  
+Hybrid → Balanced
