@@ -1519,3 +1519,258 @@ Routing algorithms help routers decide:
 Distance Vector → Simpler  
 Link State → Smarter  
 Hybrid → Balanced
+
+--------------------------------------------
+🌐 IPv4 vs IPv6 — Stateful vs Stateless
+--------------------------------------------
+
+📘 IPv4 → STATEFUL
+📘 IPv6 → STATELESS
+
+--------------------------------------------
+🔹 IPv4 (Stateful Communication)
+--------------------------------------------
+✅ Meaning:
+- "Stateful" means the system **maintains connection information (state)**
+  during communication.
+- Devices or servers remember session details (like IP, ports, etc.)
+  for each connection.
+
+🧠 Example:
+When you connect to a website over IPv4:
+1️⃣ Client → sends SYN (start request)
+2️⃣ Server → replies with SYN-ACK (acknowledgment)
+3️⃣ Client → sends ACK → Connection established (3-way handshake)
+4️⃣ Data is exchanged only *after* connection setup.
+
+📦 This is **connection-oriented**, hence stateful.
+
+💡 Used Protocol: **TCP (Transmission Control Protocol)**
+- Maintains states like connection ID, sequence numbers, etc.
+
+📊 IPv4 Statefulness Example:
+Client A -----(SYN)-----> Server B
+Server B ----(SYN-ACK)---> Client A
+Client A -----(ACK)------> Server B
+✅ Connection established (state maintained)
+
+
+❌ Drawback:
+- Each connection consumes memory & CPU to track state.
+- Less efficient for very large-scale networks (IoT, mobile).
+
+--------------------------------------------
+🔹 IPv6 (Stateless Communication)
+--------------------------------------------
+✅ Meaning:
+- "Stateless" means each packet is handled **independently**.
+- Routers do **not maintain session info** — they forward based on destination.
+- No prior connection setup needed.
+
+💡 Used Protocol: **UDP (User Datagram Protocol)** or **ICMPv6**
+- Each packet contains full source + destination info.
+
+📦 Example Flow:
+
+Client A -----> Router -----> Server B
+Each packet → carries all info → No prior connection
+
+💥 Key Feature in IPv6:
+- **Stateless Address Autoconfiguration (SLAAC)**:
+  Devices can configure their IP automatically without a DHCP server.
+
+--------------------------------------------
+🔗 Socket Address (Short Note)
+--------------------------------------------
+
+📘 Definition:
+- Socket = **IP address + Port number**
+- Uniquely identifies a process on a host for network communication.
+
+--------------------------------------------
+🔹 Components:
+1️⃣ IP Address → identifies host (IPv4/IPv6)  
+2️⃣ Port Number → identifies process/application (0–65535)
+
+📘 Format:
+- IPv4: 192.168.1.10:80  
+- IPv6: [2001:db8::1]:80
+
+--------------------------------------------
+🔹 Example:
+- Server Socket: 192.168.1.10:8080  
+- Client Socket: 192.168.1.20:50000 → Server Socket: 192.168.1.10:8080
+
+--------------------------------------------
+✅ Key Points:
+- Ensures end-to-end communication  
+- TCP/UDP use socket addresses to route data  
+- Multiple clients can connect to same server on different ports
+
+--------------------------------------------
+🔗 TCP vs UDP – Transport Layer Protocols
+--------------------------------------------
+
+📘 TCP (Transmission Control Protocol)
+--------------------------------------------
+✅ Connection-oriented → Requires handshake (3-way) before data transfer  
+✅ Reliable → Ensures delivery, order, and error checking  
+✅ Data is sent as a **stream**  
+✅ Slower due to acknowledgment & retransmission  
+✅ Example Use: HTTP, HTTPS, FTP, Email
+
+📘 UDP (User Datagram Protocol)
+--------------------------------------------
+✅ Connectionless → No handshake, sends data directly  
+✅ Unreliable → No guarantee of delivery or order  
+✅ Data is sent as **datagrams** (packets)  
+✅ Faster, low overhead  
+✅ Example Use: DNS, VoIP, Streaming, Online Gaming
+
+--------------------------------------------
+📊 Comparison Table
+
+| Feature            | TCP                     | UDP                 |
+|-------------------|------------------------|-------------------|
+| Connection         | Oriented (3-way handshake)| Connectionless     |
+| Reliability        | Reliable               | Unreliable         |
+| Ordering           | Maintains order        | No order guarantee |
+| Speed              | Slower                 | Faster             |
+| Error Checking     | Yes                    | Minimal            |
+| Flow Control       | Yes                    | No                 |
+| Use Case           | Web, Email, FTP        | Streaming, Gaming |
+
+--------------------------------------------
+🖼 Quick ASCII Diagram:
+
+TCP (Connection-oriented)
+Client ---SYN---> Server  
+Client <---SYN/ACK--- Server  
+Client ---ACK---> Server → Data Transfer
+
+UDP (Connectionless)
+Client ---> Data ---> Server (no handshake, direct)
+
+--------------------------------------------
+🔗 Session Layer (Layer 5 – OSI Model)
+--------------------------------------------
+
+📘 Definition:
+- Manages **sessions** between applications on different devices.
+- Responsible for **establishing, maintaining, and terminating** sessions.
+
+--------------------------------------------
+🔹 Key Functions:
+
+1️⃣ **Authentication**
+   - Verifies the identity of users or devices before communication.
+
+2️⃣ **Authorization**
+   - Determines what resources or actions a user/device is allowed.
+
+3️⃣ **Session Restoration / Checkpoints**
+   - Saves session state so communication can resume after interruption.
+
+4️⃣ **Flow Control & Synchronization**
+   - Controls the rate of data exchange to prevent overflow.
+   - Synchronizes dialogue between applications.
+   - Example: Webinar apps ensure video/audio sync across participants.
+
+5️⃣ **Dialog Control**
+   - Manages which device can send/receive data at a given time.
+   - Full-duplex, half-duplex, or simplex communication.
+
+--------------------------------------------
+🖼 Example Use:
+- Video conferencing (Zoom/WebEx) → keeps session alive, syncs video/audio, allows reconnection after network drop.
+- File transfer with checkpoint → resumes from last saved point.
+
+--------------------------------------------
+✅ Summary:
+Session Layer = **"Session manager"**
+- Authentication + Authorization  
+- Flow control & synchronization  
+- Checkpoint & restoration  
+- Manages dialog between apps
+
+--------------------------------------------
+🔗 Presentation Layer (Layer 6 – OSI Model)
+--------------------------------------------
+
+📘 Definition:
+- Responsible for **data translation, encryption, and compression**
+- Ensures data from the application layer is **readable by the receiver**.
+
+--------------------------------------------
+🔹 Key Functions:
+
+1️⃣ **Code Conversion / Formatting**
+   - Converts data between **different formats** (e.g., ASCII ↔ EBCDIC, JSON ↔ XML)
+   - Ensures sender and receiver interpret data correctly.
+
+2️⃣ **Encryption / Decryption**
+   - Secures data by transforming it into **cipher text**.
+   - Receiver decrypts it back to original form.
+   - Example: SSL/TLS in HTTPS.
+
+3️⃣ **Compression / Decompression**
+   - Reduces data size for faster transmission.
+   - Receiver decompresses to get original data.
+   - Example: JPEG, MP3, ZIP files.
+
+--------------------------------------------
+🖼 Example Use:
+- Sending encrypted, compressed files between applications  
+- Web browsers: SSL/TLS + data compression (gzip)
+
+--------------------------------------------
+✅ Summary:
+Presentation Layer = **“Translator & Protector”**
+- Data formatting & conversion  
+- Encrypts / decrypts for security  
+- Compresses / decompresses for efficiency
+
+--------------------------------------------
+🔗 Application Layer (Layer 7 – OSI Model)
+--------------------------------------------
+
+📘 Definition:
+- The **topmost layer** in OSI.
+- Provides **network services directly to user applications**.
+- Enables communication between software applications over a network.
+
+--------------------------------------------
+🔹 Key Functions:
+1️⃣ **Network Services for Applications**
+   - Web browsing, email, file transfer, messaging.
+   - Protocol examples: HTTP, HTTPS, FTP, SMTP, POP3, IMAP, DNS, Telnet.
+
+2️⃣ **Resource Sharing & Remote Access**
+   - Allows access to shared files, printers, or servers.
+   - Example: Remote desktop, cloud storage.
+
+3️⃣ **Data Representation & Communication Support**
+   - Works with Presentation Layer to ensure proper data formatting.
+   - Enables session management and end-user services.
+
+--------------------------------------------
+📊 Example Protocols and Use:
+
+| Protocol       | Purpose                    |
+|----------------|----------------------------|
+| HTTP/HTTPS     | Web browsing               |
+| FTP            | File transfer              |
+| SMTP/POP3/IMAP | Email services             |
+| DNS            | Domain name resolution     |
+| Telnet/SSH     | Remote login               |
+
+--------------------------------------------
+🖼 Example:
+User → Browser → HTTP → Server → Webpage content delivered
+
+--------------------------------------------
+✅ Summary:
+Application Layer = **“User Interface to Network”**
+- Provides network services directly to apps  
+- Uses standard protocols for communication  
+- Ensures applications can send/receive data over network
