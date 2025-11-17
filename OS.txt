@@ -1,3 +1,9 @@
+Basic Functionalities of OS:
+    1. Resource Management
+    2. Process Management (CPU Scheduling)
+    3. Storage Management (HD - File system)
+    4. Memory Management (RAM).
+
 OS  (user -> OS -> HardWare)
 
     two modes of operations in which a program can execute : 
@@ -185,7 +191,7 @@ Types of OS
     the CPU executes one job at a time; once a job completes or enters I/O wait, the CPU is idle until the next job is ready for execution.
     Idle CPU: The CPU remains idle during I/O operations as it only handles one job at a time.
     Starvation of Job/Process: Jobs may suffer from starvation if long or high-priority jobs keep getting processed first.
-
+    
 2. Multiprogramming OS
 
     Multi-Programming OS: Runs multiple jobs in memory simultaneously, utilizing CPU while one job waits for I/O.
@@ -228,6 +234,35 @@ Types of OS
     Process State: If a process is waiting for I/O, the CPU can switch to another process to avoid being idle.
 
     So, the actual parallelism depends on the number of CPU cores, but the OS manages time-slicing to handle multiple processes efficiently even on a single-core CPU.
+
+4️⃣ **Real-Time Operating System (RTOS)**
+   - Processes data and responds within a strict time limit.
+   - Used where timing is critical.
+   - Example: Airbag system, medical devices, robotics, youtube streaming.
+   - ⚙️ Types:
+       - Hard RTOS → Missed deadline = system failure.
+       - Soft RTOS → Occasional delay acceptable.
+
+5️⃣ **Distributed Operating System**
+   - nodes in a network (lan, wan)
+   - Manages multiple computers (nodes) as one system.
+   - Tasks shared across connected machines.
+   - Example: Amoeba, LOCUS, modern cloud clusters.
+   - ⚙️ Features: Resource sharing, reliability, scalability.
+
+6️⃣ **Clustered Operating System**
+   - nodes connected in lan network. 
+   - Similar to distributed but tightly coupled.
+   - Nodes work together for load balancing and high availability.
+   - Example: Windows Server Clustering, Linux HA.
+   - ⚙️ Features: Failover support, parallel processing.
+
+7️⃣ **Embedded Operating System**
+   - Designed for small devices with limited resources.
+   - Performs dedicated functions.
+   - Example: Android (IoT), VxWorks, RTLinux, washingmachine, fridge.
+   - ⚙️ Features: Compact, fast, low memory footprint.
+
 
 4. Program(Secondary Memory - e.g. hdd) Vs Process(Main memory)
         process structure in main memory - [ 1.code 2.data 3.heap <-> 4.stack ]
@@ -370,6 +405,86 @@ Types of OS
         -------------------------------------------
         0   2     4     6     7     8     10
 
+🧠 MULTILEVEL QUEUE SCHEDULING (Operating System)
+-------------------------------------------------------------
+
+🎯 **Definition:**
+Multilevel Queue Scheduling is a CPU scheduling method that divides the ready queue 
+into **multiple separate queues**, each with its own **priority level** and **scheduling algorithm**.
+
+-------------------------------------------------------------
+🏗️ **Concept:**
+
+- Processes are permanently assigned to one queue based on their type or priority.
+- Each queue has its own scheduling policy.
+- The CPU is allocated to queues based on their priority order.
+
+-------------------------------------------------------------
+🧩 **Example Queue Structure:**
+
+| Queue Level  | Process Type         | Scheduling Algorithm          |
+|--------------|----------------------|-------------------------------|
+| Q1 (Highest) | System / Real-time   | Round Robin (RR)              |
+| Q2           | Interactive          | Shortest Job First (SJF)      |
+| Q3           | Batch / Background   | First Come First Serve (FCFS) |
+-----------------------------------------------------------------------
+
+💡 **Advantages:**
+- Simple and organized.
+- Suitable when process types are distinct (system vs user jobs).
+- Predictable CPU allocation per queue.
+
+⚠️ **Disadvantages:**
+- Rigid — processes cannot move between queues.
+- Can lead to **starvation** of lower-priority queues.
+- Not adaptive to changing process behavior.
+
+-------------------------------------------------------------
+
+🧠 MULTILEVEL FEEDBACK QUEUE (MLFQ) SCHEDULING
+-------------------------------------------------------------
+
+🎯 **Definition:**
+Multilevel Feedback Queue (MLFQ) is an advanced CPU scheduling algorithm that allows
+**processes to move between multiple queues** based on their **behavior and CPU usage**.
+
+It’s an improvement over **Multilevel Queue Scheduling** (where queues are fixed).
+
+-------------------------------------------------------------
+🏗️ **Concept:**
+- The ready queue is divided into multiple levels.
+- Each level (queue) has its own **priority** and **time quantum**.
+- A process can move **up or down** between queues depending on how much CPU time it uses.
+
+-------------------------------------------------------------
+🧩 **Example Queue Structure:**
+
+| Queue Level | Priority | Time Quantum | Scheduling Type |
+|--------------|-----------|---------------|------------------|
+| Q1 (Top)     | Highest   | 10 ms         | Round Robin (RR) |
+| Q2           | Medium    | 20 ms         | Round Robin (RR) |
+| Q3 (Bottom)  | Lowest    | FCFS          | Batch / FCFS     |
+
+-------------------------------------------------------------
+⚙️ **How It Works:**
+
+1️⃣ **New processes** start in the top-priority queue (Q1).  
+2️⃣ If a process **uses up its entire time quantum**, it is **moved to a lower queue**.  
+3️⃣ If a process **waits too long**, it may be **promoted to a higher queue** (to avoid starvation).  
+4️⃣ The scheduler always picks the **highest-priority non-empty queue**.
+
+-------------------------------------------------------------
+💡 **Advantages:**
+✅ Reduces starvation (can promote processes)  
+✅ Adapts to process behavior (I/O bound vs CPU bound)  
+✅ Efficient and fair for mixed workloads  
+
+⚠️ **Disadvantages:**
+❌ Complex to implement  
+❌ Hard to tune time quantum and promotion/demotion rules  
+
+-------------------------------------------------------------
+
 12. Critical section and Race condition:
         Critical Section: A part of a program where shared resources are accessed, such as a shared variable count. Only one process should be in its critical section at any time to avoid incorrect behavior.
         Race Condition: Occurs when two or more processes execute concurrently and try to modify the shared variable at the same time, leading to inconsistent results.
@@ -390,7 +505,7 @@ Types of OS
 13. Synchronization Conditions:
         Mutual Exclusion: Ensures that only one process can enter its critical section (where shared resources are accessed) at a time. This prevents race conditions, as no two processes can access or modify shared data simultaneously.
         Progress: ( If process P1 is not interested in entering the critical section, it should not block or prevent process P2 from entering the critical section.) Guarantees that if no process is in its critical section and some processes wish to enter, one of the waiting processes will eventually be allowed to enter. This ensures that the system doesn't become idle unnecessarily, and work continues.
-        Bounded Waiting: (If process P1 wants to enter the critical section multiple times, it should not indefinitely prevent process P2 from entering. P1 should ensure that P2 waits for a bounded amount of time before getting its turn.) Ensures that every process has a bound (limit) on the number of times other processes are allowed to enter their critical sections before it can enter its own. This prevents starvation, ensuring that every process eventually gets its turn.
+        Bounded Waiting: (If process P1 wants to enter the critical section multiple times, it should not indefinitely prevent process P2 from entering. P1 should ensure that P2 waits for a bounded amount of time before getting its turn.) Ensures that every process has a bound (limit) on the number of times other processes are allowed to enter their critical sections before it can enter its own. This prevents starvation, ensuring that every process eventually gets its turn. (starvation = finite waiting, deadlock - infinite waiting)
         Architectural Neutrality / Portability: Implies that synchronization solutions (like algorithms or mechanisms) should work across different hardware architectures without needing major changes. The implementation should be portable and not tied to a specific hardware platform.
 
 14. Synchronization Mechanisms:
@@ -557,6 +672,8 @@ Types of OS
 
                                                                 Absolute address
 
+Memory types - Registers, cache, ram, secondary memory, tertiory memory                                                                
+
 17. Contiguous Memory Allocation:
         
         Fragmentation
@@ -564,7 +681,7 @@ Types of OS
             2. External Fragmentation: Occurs in variable partitioning. External fragmentation happens when free memory exists but is not contiguous, preventing processes that require large contiguous memory blocks from being allocated.
         
         There are two main types of partitioning in contiguous memory allocation:
-            1. Fixed Partitioning (Internal and External Fragmentation)
+            1. Fixed Partitioning (Internal and External Fragmentation) - partionin size is fixed
                     +-----------+---------+---------------+---------------+
                     | Partition |   Size  |   Process      | Unused Space |
                     +-----------+---------+---------------+---------------+
@@ -576,6 +693,11 @@ Types of OS
                     +-----------+---------+---------------+---------------+
                     |    P4     |  4 MB   | P4 (3 MB)      |   1 MB       |
                     +-----------+---------+---------------+---------------+
+                limits: 
+                    1. internal fragmentation. ( unused space in one partion)
+                    2. limit on process size.
+                    3. limit on degree of multiprograming.
+                    4. external fragmentation (unused space through the memory).
 
             2. Variable Partitioning (External Fragmentation)
                     +-----------+---------+---------------+---------------+
@@ -589,6 +711,9 @@ Types of OS
                     +-----------+---------+---------------+---------------+
                     |    P4     |  3 MB   | P4             |   0 MB       |
                     +-----------+---------+---------------+---------------+
+                
+                1. external fragmentation.
+                2. Allocation/Deallocation is complex.
 
             Compaction Method : reduces CPU utilization
 
@@ -713,8 +838,8 @@ Types of OS
         +----+--------+    +----+--------+    +----+--------+    +----+--------+    +----+--------+    +----+--------+    +----+--------+    +----+--------+    +----+--------+    +----+--------+ 
 
 19. Pagination
-        Pages: Fixed-size blocks of the process in logical memory.
-        Frames: Fixed-size blocks in physical memory.
+        Pages: Fixed-size blocks of the process in Secondary memory.
+        Frames: Fixed-size blocks in ram.
         Page size = Frame size
 
         +-----+     +-----+     +-----+     +-----+
@@ -856,6 +981,278 @@ Types of OS
                   |     5      |      8              |                                                                
                   +----------------------------------+          
 
+🧠 INVERTED PAGING (Inverted Page Table) — 
+
+----------------------------------------------------
+📘 Definition:
+Inverted Paging uses a single page table for the entire system
+instead of having one page table per process.
+
+Each entry in the table corresponds to a physical frame
+and stores (Process ID, Virtual Page Number, Control bits).
+
+----------------------------------------------------
+📗 Structure of an Inverted Page Table Entry:
+| Frame No | PID | Virtual Page | Control Bits |
+
+----------------------------------------------------
+📘 Working (Address Translation Steps):
+1. CPU generates a virtual address (VPN, Offset).
+2. OS searches the Inverted Page Table using (PID, VPN).
+3. If found → retrieves the corresponding Physical Frame Number (PFN).
+4. Combine PFN + offset → gives the physical address.
+5. If not found → Page Fault occurs → page loaded from disk.
+
+----------------------------------------------------
+📗 Example:
+| Frame No | PID | Virtual Page | Valid |
+|-----------|-----|---------------|--------|
+| 0 | 3 | 5 | 1 |
+| 1 | 2 | 4 | 1 |
+| 2 | 1 | 9 | 1 |
+| 3 | 3 | 7 | 1 |
+
+If Process 3 requests Virtual Page 7 → found in Frame 3.
+
+----------------------------------------------------
+📘 Advantages:
+✅ Reduces memory usage (only one table for the system)
+✅ Efficient for large virtual address spaces (like 64-bit)
+✅ Scales better than per-process tables
+
+----------------------------------------------------
+📙 Disadvantages:
+❌ Slower lookup (must search or use hashing)
+❌ More complex to manage in hardware
+
+----------------------------------------------------
+📗 Comparison:
+
+| Feature             | Normal Page Table | Inverted Page Table |
+|----------------------|------------------|---------------------|
+| No. of Tables        | One per process  | One for entire system |
+| Indexed By           | Virtual Page No. | Physical Frame No.  |
+| Memory Usage         | Large            | Small               |
+| Lookup Speed         | Fast (direct)    | Slow (search/hash)  |
+
+----------------------------------------------------
+📘 Optimization:
+To reduce lookup time → systems often use a HASHED PAGE TABLE.
+----------------------------------------------------------------------------------
+
+🧠 OVERLAY STRUCTURE IN OPERATING SYSTEM 
+
+----------------------------------------------------
+📘 DEFINITION:
+Overlay is a memory management technique used to run
+large programs in small main memory.
+
+👉 Only the required part (module) of a program is loaded into memory at a time.
+👉 Unused parts are swapped out and replaced (overlaid) by other modules when needed.
+
+----------------------------------------------------
+📗 PURPOSE:
+- Used when program size > available main memory.
+- Saves memory by keeping only the active part in RAM.
+- Implemented by the programmer (in older systems).
+
+----------------------------------------------------
+📘 BASIC CONCEPT:
+Program is divided into independent *modules* (segments).
+Some modules are permanently resident, while others are overlaid.
+
+Example:
+sql
+Copy code
+    +---------------------------+
+    |       MAIN ROUTINE        | <-- Resident (always in memory)
+    +---------------------------+
+    |       OVERLAY 1           | <-- Loaded when needed
+    +---------------------------+
+    |       OVERLAY 2           | <-- Loaded after Overlay 1
+    +---------------------------+
+sql
+Copy code
+
+When Overlay 2 is required, Overlay 1 is replaced (overlaid) in memory.
+
+----------------------------------------------------
+📙 COMPONENTS OF OVERLAY STRUCTURE:
+
+1️⃣ **Symbol Table**
+   - Contains names and addresses of variables, functions, and labels.
+   - Used by the linker/loader to resolve references across overlays.
+
+2️⃣ **Common Routine (Shared Code)**
+   - Part of the program used by multiple overlays.
+   - Loaded permanently in memory (so overlays can call it when needed).
+
+3️⃣ **Pass (Compiler/Assembler Phase)**
+   - The process of generating object code from source code.
+   - In overlay systems, passes are divided so that each pass fits into memory.
+   - Example: 
+     - Pass 1: Generates symbol table.
+     - Pass 2: Generates final machine code using symbol table.
+
+4️⃣ **Overlay Driver**
+   - Special routine responsible for loading required overlays into memory.
+   - Handles transitions between overlays.
+   - Ensures correct modules are in memory at the right time.
+
+----------------------------------------------------
+📘 WORKING:
+1️⃣ Program divided into modules.
+2️⃣ Overlay structure is created specifying which modules share memory.
+3️⃣ Overlay driver loads the necessary module when control transfers.
+4️⃣ Symbol table ensures correct addressing of shared/common routines.
+5️⃣ When module finishes, driver replaces it with the next required module.
+
+----------------------------------------------------
+📗 ADVANTAGES:
+✅ Efficient use of limited memory.
+✅ Enables large programs to run in small memory.
+✅ Reduces overall memory footprint.
+
+----------------------------------------------------
+📙 DISADVANTAGES:
+❌ Complex programming and management.
+❌ Slower due to frequent I/O (loading overlays).
+❌ Manual design required (modern OS handle this automatically via virtual memory).
+
+----------------------------------------------------------------------------------
+
+🧠 VIRTUAL MEMORY & PAGE FAULT — 
+
+----------------------------------------------------
+📘 VIRTUAL MEMORY (VM):
+
+🔹 Definition:
+Virtual Memory is a memory management technique
+that provides an illusion of a large, continuous main memory
+to each process — even if physical RAM is smaller.
+
+It allows processes to use more memory than physically available
+by storing part of the data on disk.
+
+----------------------------------------------------
+📗 Key Concepts:
+1️⃣ Virtual Address Space (VAS)
+   - Logical memory space assigned to each process.
+   - Divided into pages (fixed size blocks).
+
+2️⃣ Physical Memory
+   - Actual RAM divided into frames (same size as pages).
+
+3️⃣ Page Table
+   - Maps virtual pages → physical frames.
+   - Used during address translation.
+
+4️⃣ Backing Store
+   - Secondary storage (disk) used to hold pages not in RAM.
+-----------------------------------------------------------
+📘 trap
+A trap in virtual memory is a CPU interrupt that occurs when a page fault happens — meaning the required page is not in main memory, so the OS must load it from disk.
+----------------------------------------------------
+📘 Working of Virtual Memory:
+1. Process generates a Virtual Address (VA).
+2. OS checks Page Table for mapping:
+   - If present → Physical Frame found → Access directly.
+   - If not present → PAGE FAULT occurs.
+3. If page fault occurs:
+   - OS loads the missing page from disk into RAM.
+   - Updates Page Table with the new mapping.
+   - Then restarts the instruction.
+
+----------------------------------------------------
+📗 PAGE Hit:
+🔹 Definition
+A Page Hit occurs when a process tries to access: 
+a page that is already loaded into main memory (RAM).
+----------------------------------------------------
+📗 PAGE FAULT:
+
+🔹 Definition:
+A Page Fault occurs when a process tries to access
+a page that is not currently loaded into main memory (RAM).
+
+----------------------------------------------------
+📘 Steps in Handling a Page Fault:
+1️⃣ CPU generates a virtual address.
+2️⃣ OS checks page table → "Valid bit = 0" → Page not in RAM.
+3️⃣ OS suspends the process (page fault interrupt).
+4️⃣ Finds a free frame (or selects a victim page for replacement).
+5️⃣ Loads the required page from disk into the frame.
+6️⃣ Updates the Page Table (Valid bit = 1, Frame No = X).
+7️⃣ Restarts the interrupted instruction.
+
+----------------------------------------------------
+📙 PAGE REPLACEMENT POLICIES:
+When no free frame is available:
+1️⃣ FIFO (First In First Out)
+2️⃣ LRU (Least Recently Used)
+3️⃣ Optimal (Replace the page not needed for longest time)
+4️⃣ Clock / Second Chance Algorithm
+
+----------------------------------------------------
+📘 ADVANTAGES of Virtual Memory:
+✅ Allows large programs to run on small physical memory
+✅ Provides process isolation (security)
+✅ Efficient use of physical memory
+✅ Simplifies memory management
+
+----------------------------------------------------
+📙 DISADVANTAGES:
+❌ Slower access due to disk I/O
+❌ More complexity in OS
+❌ Page Faults reduce performance (Thrashing risk)
+
+🧠 THRASHING — Operating System Notes
+
+----------------------------------------------------
+📘 DEFINITION:
+Thrashing occurs when the operating system spends most of its time
+swapping pages in and out of main memory instead of executing processes.
+
+It happens when **the degree of multiprogramming is too high** and
+there is **insufficient physical memory** to handle all active processes.
+
+----------------------------------------------------
+📗 KEY CONCEPT:
+- Each process has a *working set* (pages it actively uses).
+- If the total working sets of all processes > total available frames,
+  the system will continuously swap pages (thrashing).
+
+----------------------------------------------------
+📘 CAUSES OF THRASHING:
+1️⃣ High degree of multiprogramming (too many processes in memory).  
+2️⃣ Insufficient number of frames.  
+3️⃣ Poor page replacement algorithm.  
+4️⃣ Sudden increase in process working set size.  
+5️⃣ Overcommitment of physical memory.
+----------------------------------------------------
+📗 EFFECTS OF THRASHING:
+❌ High page fault frequency  
+❌ Reduced throughput  
+❌ Low CPU utilization  
+❌ Increased I/O wait time  
+❌ System performance degradation  
+----------------------------------------------------
+📘 INDICATORS OF THRASHING:
+1️⃣ Very high page fault rate.  
+2️⃣ Low CPU utilization (CPU waiting for I/O).  
+3️⃣ Excessive disk I/O (swapping activity).  
+4️⃣ Overall system slowdown.
+
+----------------------------------------------------
+📘 PREVENTION / CONTROL TECHNIQUES:
+1️⃣ **Working Set Model** — Keep only active pages in memory.  
+2️⃣ **Page Fault Frequency (PFF)** — Control degree of multiprogramming dynamically.  
+3️⃣ **Use Better Replacement Algorithm (e.g., LRU).**  
+4️⃣ **Suspend or swap out processes** when page fault rate is too high.  
+5️⃣ **Increase Physical Memory (RAM)** if possible.  
+----------------------------------------------------
+
+
 21. Translation Lookaside Buffer (TLB):
         used for frequently refered page
         TLB (Translation Lookaside Buffer) is a small, fast cache in the memory management unit (MMU) that stores a subset of the page table entries to speed up the translation from logical to physical addresses. It holds the most frequently referenced pages, reducing the number of times the page table has to be consulted.
@@ -951,6 +1348,12 @@ Types of OS
                     **Page Faults**: 6 page faults  
                     **Final Frame Content**: [ 1, 2, 7 ]
 
+                    # Belady's Anomaly in LRU (OS)
+
+                    Belady’s Anomaly → When increasing the number of page frames causes *more* page faults.  
+                    # FIFO may give more faults with 4 frames than with 3.
+
+
                 2. LRU (Least Recently Used)
                     In LRU, we replace the page that has not been used for the longest time. The page replacement decision is based on the order of recent accesses.
 
@@ -990,6 +1393,29 @@ Types of OS
 
                     **Page Faults**: 5  
                     **Final Frame Content**: [ 2, 7, 6 ]
+                
+                4. Most Recently Used (MRU)
+                    In the MRU algorithm, the page that was used most recently is replaced.
+                    The assumption is that the most recently used page is less likely to be needed soon.
+                    This is opposite of the LRU strategy.
+
+                    Reference String: 4, 7, 6, 1, 7, 6, 1, 2, 7, 2
+                    Frames in memory: [ - , - , - ]  (Initial state)
+
+                    Step 1: Reference 4 → Load 4 → [ 4, - , - ]
+                    Step 2: Reference 7 → Load 7 → [ 4, 7, - ]
+                    Step 3: Reference 6 → Load 6 → [ 4, 7, 6 ] (All frames are full now)
+                    Step 4: Reference 1 → Replace MRU = 6 → [ 4, 7, 1 ] (Most recently used page before this step was 6)
+                    Step 5: Reference 7 → Already in memory → [ 4, 7, 1 ] (MRU becomes 7)
+                    Step 6: Reference 6 → Not in memory → Replace MRU = 7 → [ 4, 6, 1 ]
+                    Step 7: Reference 1 → Already in memory → [ 4, 6, 1 ] (MRU becomes 1)
+                    Step 8: Reference 2 → Replace MRU = 1 → [ 4, 6, 2 ]
+                    Step 9: Reference 7 → Not in memory → Replace MRU = 2 → [ 4, 6, 7 ]
+                    Step 10: Reference 2 → Not in memory → Replace MRU = 7 → [ 4, 6, 2 ]
+
+                    **Page Faults**: 7  
+                    **Final Frame Content**: [ 4, 6, 2 ]
+
 
 24. Segementation (same like pagination, close to user understanding):
         Logical Address: The address generated by the CPU during execution, consisting of a segment number and an offset.
@@ -1013,7 +1439,7 @@ Types of OS
           |  Base      |  Limit              |      |          |                     |        |
           +------------+---------------------+ <----+          +---------------------+        |
         0 |     0      |      3              |                 |                     |        |
-        1 |     1      |      4              |                 +---------------------+        |                       |
+        1 |     1      |      4              |                 +---------------------+        |                       
         2 |     2      |      2              | ------------(PA)-------------------------------+                                      
           +----------------------------------+
 
@@ -1073,7 +1499,7 @@ Types of OS
 
         Semaphores are used to control access to critical sections (shared resources) in a way that prevents race conditions and ensures that processes run in an orderly fashion.
 
-        Types of Semaphores
+        Types of Semaphores (semaphore may be application level or kernal/os level)
             1. Binary Semaphore (also called a Mutex Semaphore)
                 A binary semaphore can only take two values: 0 or 1. It is used to ensure mutual exclusion in critical sections, where only one process can execute in the critical section at a time.
 
@@ -1219,3 +1645,247 @@ Types of OS
         | EA  |  -  |  -  | ES  | ET1 | EX1 | ET0 | EX0 |
         +-----+-----+-----+-----+-----+-----+-----+-----+
            7     6     5     4     3     2     1     0
+
+Hard Disk Architecture (OS)
+
+A Hard Disk Drive (HDD) consists of multiple platters that store data magnetically.
+Each platter has two surfaces, and each surface is accessed by a read/write head.
+The actuator arm moves the heads across tracks, and the spindle rotates the platters.
+
+Components:
+- Disk / Platters
+- Surfaces
+- Tracks
+- Sectors
+- Spindle
+- Actuator Arm
+- Read/Write Heads
+- Data
+                         actuator Arm
+           spindle         |
+              |     +------|
+  disk  -------------      |
+              |     +------|  
+              |            |
+              |     +------|
+        -------------      |
+              |     +------|
+              |            |
+              |     +------|
+        -------------      |
+              |     +------|
+              |            |
+              |     +------|
+        -------------      |
+              |     +------|
+              |            |
+              |     +------|
+        -------------      |
+                    +------|
+                     |
+            read\write heads
+
+        +-------------------------------+
+        |            TRACK              |
+        |   (Concentric circular path)  |
+        |     ┌─────────────────────┐   |
+        |     |          +------+   |   |
+        |     │SECTOR    | data |   |◄── Sector (slice of track)
+        |     |          +------+   |   |
+        |     └─────────────────────┘   |
+        +-------------------------------+
+
+
+DATA ORGANIZATION (Logical)
+
+Platter → Surface → Track → Sector → Data Block
+
+Example:
+    Track 12, Sector 6  →  Contains 512 bytes / 4 KB (typical)
+
+Seek Time (Ts): Time for head to move to target track.
+Formula: Ts = (number of tracks moved) × (seek time per track)
+
+Rotation Time (Tr): Time for one full rotation.
+Formula: Tr = 1 / Rotation Speed (RPS)
+
+Rotational Latency (Tl): Average time waiting for sector.
+Formula: Tl = 0.5 × Rotation Time
+
+Transfer Time (Tt): Time to read/write data.
+Formula: Tt = Data Size / Transfer Rate
+
+Transfer Rate = Number of Heads × Capacity of One Track × Rotations per Second (RPS)
+Formula: R = Data Size / Transfer Time
+
+Controller Time (Tc): Time for controller to process request.
+Formula: Tc = constant (device-dependent)
+
+Disk Access Time (Ta): Total time to access data.
+Formula: Ta = Ts + Tl + Tt + Tc
+
+Disk Scheduling Algorithms
+1) FCFS (First-Come-First-Serve)
+   Sequence: 50 → 82 → 170 → 43 → 140 → 24 → 16 → 190
+   Total seek distance = 642 tracks
+   Seek time = 642 × (seek_time_per_track)
+
+2) SSTF (Shortest Seek Time First)
+   Sequence: 50 → 43 → 24 → 16 → 82 → 140 → 170 → 190
+   Total seek distance = 208 tracks
+   Seek time = 208 × (seek_time_per_track)
+
+3) SCAN (Elevator) — moving RIGHT initially, goes to end (199) then reverses
+   Sequence: 50 → 82 → 140 → 170 → 190 → 199 → 43 → 24 → 16
+   Total seek distance = 332 tracks
+   Seek time = 332 × (seek_time_per_track)
+
+4) C-SCAN (Circular SCAN) — moving RIGHT, jump from end to start NOT counted
+   Sequence (counted movements): 50 → 82 → 140 → 170 → 190 → 199  (jump) 0 → 16 → 24 → 43
+   Total seek distance = 192 tracks   (jump 199→0 not counted)
+   Seek time = 192 × (seek_time_per_track)
+
+5) C-LOOK (Circular LOOK) — move right to highest request, jump to lowest request (jump not counted)
+   Sequence: 50 → 82 → 140 → 170 → 190  (jump) 16 → 24 → 43
+   Total seek distance = 167 tracks   (jump not counted)
+   Seek time = 167 × (seek_time_per_track)
+
+6) LOOK
+   - Head moves in one direction and serves requests until the last request in that direction,
+     then reverses (does NOT go to the physical disk end).
+
+   Assumed initial direction: RIGHT
+
+   Sequence:
+     50 → 82 → 140 → 170 → 190 → 43 → 24 → 16
+
+   Total seek distance = 314 tracks
+   Seek time = 314 × (seek_time_per_track)
+
+------------------------------------------------------------
+Best (minimum total seek) : C-LOOK  → 167 tracks
+Worst (maximum total seek): FCFS   → 642 tracks
+-------------------------------------------------------------
+
+====================================================
+🟦 HOW FILES ARE STORED ON DISK (Short + Simple)
+====================================================
+
+A file is divided into **fixed-size blocks** (like pages in RAM).
+Disk is divided into **sectors → blocks** (e.g., 512B, 4KB).
+
+FILE → split into BLOCKS:
+   File F = [ B0 | B1 | B2 | B3 | ... ]
+
+These blocks must be stored somewhere on disk.
+Different OS use different methods:
+
+====================================================
+1) CONTIGUOUS ALLOCATION
+====================================================
+
+File occupies consecutive disk blocks (like an array).
+
+ Diagram:
+   Disk Blocks →
+   [100][101][102][103][104][105][106]...
+          ^---------- File F --------^
+
+ Directory Entry:
+   F → (start = 101, length = 4)
+
+ Notes:
+  ✔ Fast sequential & random access  
+  ✘ External fragmentation  
+  ✘ File cannot grow easily  
+
+====================================================
+2) LINKED (CHAINED) ALLOCATION
+====================================================
+
+Each file block points to the next block (like a linked list).
+
+ Diagram:
+   F → [120] → [305] → [412] → [500] → NULL
+
+ Block structure:
+   [ data | next_block ]
+
+ Directory Entry:
+   F → (first_block = 120)
+
+ Notes:
+  ✔ Easy to grow file  
+  ✔ No external fragmentation  
+  ✘ Slow random access (must follow chain)  
+  ✘ Pointer loss breaks file  
+
+====================================================
+3) INDEXED ALLOCATION
+====================================================
+
+One **index block** stores all pointers to the file’s data blocks.
+(Like a PAGE TABLE for a file!)
+
+ Diagram:
+      index block (700)
+        ┌────────────────────────────┐
+        │120 │ 305 │ 412 │ 560 │ ... │
+        └────────────────────────────┘
+          ↓     ↓     ↓     ↓
+        [120] [305] [412] [560] ...
+
+ Directory Entry:
+   F → (index_block = 700)
+
+ Notes:
+  ✔ Fast random access (direct jump)  
+  ✔ Easy to grow  
+  ✘ Index block overhead  
+  ✘ Very large files need multi-level index  
+
+====================================================
+4) UNIX INODE (Indexed + Levels)
+====================================================
+
+Inode stores file metadata + pointers:
+ - 12 direct pointers
+ - 1 single indirect (one-level index)
+ - 1 double indirect (two levels)
+ - 1 triple indirect (three levels)
+
+ Diagram:
+    inode(42)
+     ┌─────────────────────────────────┐
+     │ direct[0..11] │ single │ double │
+     └─────────────────────────────────┘
+          ↓             ↓        ↓
+        data         index     index-of-index
+
+ Notes:
+  ✔ Efficient for small & medium files  
+  ✔ Scales to huge files  
+  ✔ Used in UNIX/Linux (ext3/ext4)  
+  ✘ Indirection overhead for very large offsets  
+  ----------------------------------------------------
+
+
+1 bit  = 2^0  bits
+1 Byte (B) = 8 bits = 2^3 bits
+1 KB = 2^10 B
+1 MB = 2^20 B
+1 GB = 2^30 B
+1 TB = 2^40 B
+1 PB = 2^50 B
+1 EB = 2^60 B
+
+2^1  = 2
+2^2  = 4
+2^3  = 8
+2^4  = 16
+2^5  = 32
+2^6  = 64
+2^7  = 128
+2^8  = 256
+2^9  = 512
+2^10 = 1024
