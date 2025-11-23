@@ -1,0 +1,1077 @@
+===================== DOCKER NOTES =====================
+
+WHAT IS DOCKER?
+- Docker is a tool that packages an application and all dependencies
+  into a lightweight unit called a "container", so it runs the same everywhere.
+
+================ WHY DO WE NEED DOCKER? =================
+
+PROBLEM (Before Docker):
+----------------------------------------------------------
+1) Developer Team:
+   - Dev installs Node.js 16, Python 3.10, MySQL 5.7 manually.
+   - Adds configs in /etc/app/config.
+   - App runs perfectly on DEV machine.
+
+2) Tester Team:
+   - Tester has different OS (Ubuntu vs Dev’s MacOS).
+   - Tester has Node.js 18, MySQL 8.
+   - When running the same app → errors:
+        "Dependency version mismatch"
+        "Package not found"
+        "Config file missing"
+        "Works on my machine but not on test server"
+
+3) Operations Team:
+   - Running on different server with different environment.
+   - Missing libraries, wrong versions.
+   - Deployment takes hours/days to fix installation problems.
+
+ROOT CAUSE:
+- Every environment (dev / test / prod) is different.
+- Manual setup causes mistakes.
+- OS differences create conflicts.
+- Configs differ from machine to machine.
+
+----------------------------------------------------------
+SOLUTION USING DOCKER:
+----------------------------------------------------------
+With Docker:
+- Developer creates one Docker IMAGE that contains:
+      ✔ Correct Node/Python/Java version
+      ✔ All dependencies
+      ✔ All libraries
+      ✔ All configuration files
+      ✔ OS-level environment
+
+Example:
+Dockerfile defines everything:
+    FROM node:16
+    COPY . .
+    RUN npm install
+    CMD ["npm", "start"]
+
+- This image is shared with Tester and Operations.
+
+RESULT:
+- TESTER runs:  docker run myapp:latest
+- OPS runs:     docker run myapp:latest
+- DEVELOPER also runs the same: docker run myapp:latest
+
+BENEFITS:
+----------------------------------------------------------
+✔ SAME environment everywhere (Dev/Test/Prod).
+✔ No need to install Node, Python, MySQL manually.
+✔ No configuration conflicts.
+✔ No OS/version mismatch.
+✔ Deployment becomes faster & error-free.
+✔ “Works on my machine” problem disappears.
+
+----------------------------------------------------------
+
+SUMMARY (One Line):
+Docker packages your entire application + environment
+into an image so every team runs the EXACT SAME setup
+without conflicts.
+
+==========================================================
+
+WHAT IS A CONTAINER?
+- A running instance of a Docker image.
+- Lightweight, isolated environment.
+- Uses OS kernel of host (not full OS like VM).
+- There is no data persistence in a container (after restart all data will be lost). Use docker volumes dor data persistence.
+
+Example:
+docker run nginx:latest
+(Here the container starts running.)
+
+---------------------------------------------------------
+
+WHAT IS A DOCKER IMAGE?
+- A read-only template with app code + dependencies + OS layers.
+- Blueprint used to create containers.
+
+Example:
+docker pull nginx:1.21
+
+---------------------------------------------------------
+
+IMAGE VS CONTAINER (DIFFERENCE)
+Image:
+- Read-only template.
+- Stored in registry.
+- Blueprint (like a class).
+
+Container:
+- Running instance of image.
+- Has writable layer.
+- Running process (like an object).
+
+---------------------------------------------------------
+
+WHAT IS DOCKER REPOSITORY?
+- A storage location for images.
+- Hosted on Docker Hub, GitHub Container Registry, AWS ECR, GCP GCR, Azure ACR.
+
+Examples:
+Docker Hub repo:
+    nginx/nginx
+AWS ECR repo:
+    123456789012.dkr.ecr.us-east-1.amazonaws.com/myapp
+
+---------------------------------------------------------
+
+DOCKER IMAGE LAYERS
+- Every Docker image is built in multiple layers.
+- Each command in Dockerfile creates one layer.
+- Layers are cached and reused.
+- Helps avoid re-downloading/rebuilding.
+
+Example layers:
+FROM node:18
+COPY package.json .
+RUN npm install   <-- creates a layer
+COPY . .          <-- another layer
+
+---------------------------------------------------------
+
+LAYER REUSE / CACHE EXPLANATION
+- If two images share same layers, Docker downloads/keeps layer ONLY ONCE.
+- Only new or changed layers are downloaded again.
+
+Example:
+Image A = app:v1  (layers L1, L2, L3)
+Image B = app:v2  (layers L1, L2, L4)
+
+Docker downloads:
+- L1, L2 (already exists → reused)
+- L3 (for v1)
+- L4 (new layer for v2)
+
+---------------------------------------------------------
+
+RUNNING MULTIPLE VERSIONS AT SAME TIME
+- Yes, Docker allows running different versions simultaneously.
+- Because images are separate and containers are isolated.
+
+Example:
+
+docker run myapp:v1
+docker run myapp:v2
+
+Both run independently without conflict.
+
+---------------------------------------------------------
+
+==========================================================
+DOCKER BASE IMAGE:
+----------------------------------------------------------
+- Every Docker image starts from a BASE IMAGE.
+- Most base images are lightweight LINUX distributions like:
+      ✔ Alpine Linux
+      ✔ Ubuntu
+      ✔ Debian
+- So your app actually runs on a mini Linux OS inside the container.
+
+Example:
+    FROM node:16-alpine       ← this is a Linux-based image
+    FROM python:3.10-slim     ← Linux again (Debian)
+
+This ensures consistency no matter what OS the developer/tester uses:
+Windows / Mac / Ubuntu / CentOS — ALL run the same Linux environment.
+
+================ OS STRUCTURE (BASIC) ================
+Software stack of any OS:
+
+   +-----------------------+
+   |     Applications      |
+   +-----------------------+
+   |        Kernel         |
+   +-----------------------+
+   |   Hardware (CPU/RAM)  |
+   +-----------------------+
+
+VM includes BOTH: Kernel + Applications  
+Docker includes ONLY: Applications (uses host kernel)
+
+================== WHAT IS A VIRTUAL MACHINE (VM)? ==================
+
+VM (Virtual Machine):
+----------------------------------------------------------
+- A VM is a full computer running inside another computer.
+- It contains:
+      ✔ Full Operating System (OS)
+      ✔ Kernel
+      ✔ Applications
+- VMs use a Hypervisor (VMware, VirtualBox, Hyper-V) to run.
+
+Example:
+A Windows laptop running a full Ubuntu VM.
+
+
+================ VM vs DOCKER (MAIN DIFFERENCES) ==================
+
+1) **OS & Kernel**
+----------------------------------------------------------
+VM:
+- Has its **own kernel** + full OS (Ubuntu, Windows etc).
+- Heavy and large because each VM = full OS.
+
+Docker:
+- Has **NO own kernel**.
+- Uses the **host OS kernel**.
+- Only ships application + dependencies.
+- Lightweight and small.
+
+
+
+2) **SIZE**
+----------------------------------------------------------
+VM:
+- Very large → usually 2GB–20GB per VM.
+- Because OS + kernel included.
+
+Docker:
+- Very small → 50MB, 100MB, sometimes 200MB.
+- Only application + libraries.
+
+
+
+3) **SPEED (Boot Time)**
+----------------------------------------------------------
+VM:
+- Slow startup → 20–60 seconds.
+
+Docker:
+- Extremely fast → starts in milliseconds.
+
+
+
+4) **COMPATIBILITY (IMPORTANT!)**
+----------------------------------------------------------
+VM:
+- Kernel is inside VM.
+- So a VM of ANY OS can run on ANY host.
+
+Example:
+- Run Windows VM on Linux host.
+- Run Linux VM on MacOS host.
+- NO compatibility issue because VM has own kernel.
+
+Docker:
+- Uses HOST kernel → so kernel must match.
+
+Linux containers → run only on Linux kernel  
+You cannot run a Linux Docker image natively on Windows kernel.
+
+
+
+===================== WHY DOCKER TOOLBOX WAS USED? =====================
+
+Problem:
+- Old Windows (Windows 7/8) and old MacOS did NOT support Linux kernel features.
+- Docker needs Linux kernel (namespaces, cgroups, overlay filesystem).
+- So Docker could not run natively.
+
+Solution → **Docker Toolbox**:
+----------------------------------------------------------
+Docker Toolbox installed:
+    ✔ Oracle VirtualBox VM  
+    ✔ A tiny Linux VM  
+    ✔ Docker Engine inside that VM  
+
+Meaning:
+- Docker Toolbox created a small Linux VM (lightweight).
+- Docker ran **inside the VM**.
+- This trick allowed Docker (Linux containers) to run on Windows/Mac.
+
+Command Example:
+docker-machine create default
+docker-machine start default
+
+Today:
+- Docker Toolbox is replaced by **Docker Desktop** which uses:
+    - WSL2 on Windows  
+    - Hypervisor on Mac  
+- Much faster and native-like performance.
+
+
+# ------------------------
+  Docker Port Binding Note
+# ------------------------
+
+# Format:
+   -p HOST_PORT:CONTAINER_PORT
+
+# CONTAINER_PORT:
+   The port your app runs on INSIDE the container.
+   Example: your Node.js/Java/Spring app runs on port 3000 inside.
+
+# HOST_PORT:
+   The port on your actual machine (laptop/server) through which
+   you will access the container's app.
+
+# Why this is useful?
+ -------------------
+ Each container has its own isolated internal network.
+ This means multiple containers can use the SAME internal port
+ (e.g., 3000) without conflict.
+
+ But on the HOST, ports must be unique.
+ So we map each container's internal port to DIFFERENT host ports.
+
+ Example: run the same app 3 times on the same machine
+ -----------------------------------------------------
+
+docker run -d -p 8081:3000 myapp   # Container 1 → localhost:8081
+docker run -d -p 8082:3000 myapp   # Container 2 → localhost:8082
+docker run -d -p 8083:3000 myapp   # Container 3 → localhost:8083
+
+ All containers use port 3000 internally,
+ but you access them through different HOST ports.
+
+# Summary:
+   CONTAINER_PORT can be same for all containers.
+   HOST_PORT must be different for each container.
+
+# ----------------------
+ CI / CD 
+# ----------------------
+
+# CI → Continuous Integration
+ ---------------------------
+ Happens when you PUSH code or create a MERGE REQUEST.
+ GitLab runs pipeline stages like:
+   1. install
+   2. build
+   3. test
+   4. lint
+   5. sonarqube
+
+# Purpose:
+   - Check your code automatically BEFORE merging the MR.
+   - Make sure your changes don't break the project.
+
+# Simple flow:
+   push code → CI pipeline runs → if all stages pass → MR is safe to merge
+
+
+# CD → Continuous Delivery / Deployment
+ -------------------------------------
+ Runs AFTER CI is successful.
+
+# Delivery:
+   - Automatically prepares deployment (build artifact, docker image)
+   - Needs manual approval to deploy.
+
+# Deployment:
+   - Automatically deploys to dev/staging/prod with NO manual step.
+
+# Simple flow:
+   CI passed → CD deploys to the environment → new version goes live
+
+
+# Summary:
+   CI = automatic test/build before merge (MR pipeline).
+   CD = automatic deployment after merge (to dev/staging/prod).
+
+# In short = CI before merge and cd after merge
+    CI = runs BEFORE merge (build + test your code)
+    CD = runs AFTER merge (deploy your code)
+
+
+# ---------------------------
+# Basic Docker Commands (Note)
+# image name = xyz
+# container id = cntId
+# container name = cntName
+# ---------------------------
+
+# Pull image (latest or specific version)
+docker pull xyz
+docker pull xyz:2.2
+
+#upload your local image → to a remote registry
+    (registry can be Docker Hub, AWS ECR, GitHub Container Registry, etc.)
+docker push <registry-url>/<repo-name>:<tag>
+    docker login
+        aws ecr get-login-password --region ap-south-1 \
+        | docker login --username AWS --password-stdin 618305041992.dkr.ecr.ap-south-1.amazonaws.com
+    docker tag myapp:latest myusername/myapp:latest
+        docker tag myapp:latest 618305041992.dkr.ecr.ap-south-1.amazonaws.com/myapp:latest
+    docker push myusername/myapp:latest
+        docker push 618305041992.dkr.ecr.ap-south-1.amazonaws.com/myapp:latest  (618305041992.dkr.ecr.ap-south-1.amazonaws.com/myapp:latest = registry domain)
+
+# rename an image OR give an image another name
+Because registries (Docker Hub, AWS ECR, GitHub) require a specific name.
+Before pushing → you must tag image with registry URL + repo name.
+tag copy that image and creats new one with the given name
+
+docker tag <source-image>:<tag> <target-image>:<tag>
+
+
+
+# Run image (creates + starts a container)
+docker run xyz                # attach mode (shows logs)
+docker run -d xyz             # detach mode (runs in background)
+
+# Port mapping (HOST_PORT:CONTAINER_PORT)
+docker run -p 5000:6379 xyz           # attach mode
+docker run -p 5000:6379 -d xyz        # detach mode
+
+# Run container with a name
+docker run -p 5000:6379 -d xyz --name new_container_name
+
+# Remove a container by CONTAINER ID
+docker rm cntId
+
+# Remove a container by NAME
+docker rm cntName
+
+# Run container with all Options
+docker run -d \
+  --name new_container_name \
+  -p 5000:3000 \
+  -e NODE_ENV=production \
+  -v /host/path:/app/data \
+  --network my-net \
+  --restart always \
+  xyz
+
+    # Summary:
+    #   --name         → container name
+    #   -d             → detach mode
+    #   -p A:B         → port mapping (host:container)
+    #   -e KEY=VALUE   → environment variables
+    #   --env-file     → load env vars from file
+    #   -v A:B         → volume mapping
+    #   --network      → connect to docker network
+    #   --restart      → auto restart policy
+    #   --cpus/--memory→ resource limits
+    #   --rm           → delete container after exit
+
+# List running containers
+docker ps
+
+# List all containers (running + stopped)
+docker ps -a
+
+# List images
+docker images
+# OR
+docker image ls
+
+# Stop a running container
+docker stop cntId
+
+# Start a stopped container
+docker start cntId
+
+# View logs
+docker logs cntId
+docker logs cntName
+
+# Follow logs in real-time (like "live logs")
+docker logs -f cntId
+# -f = follow (keep showing new logs as they come)
+
+# Show last N lines of logs
+docker logs --tail 50 cntId
+# shows only last 50 log lines
+
+# Enter a running container (interactive shell)
+docker exec -it cntId /bin/bash
+# /bin/bash = run bash shell inside container
+# /bin/sh = use /bin/sh if bash is not available use shell
+
+# Meaning:
+#   image → blueprint
+#   container → running instance of image
+#   run command is related with image
+#   start command is related with container
+
+
+# ----------------------------
+ Docker Network (Beginner Note)
+# ----------------------------
+
+# What is Docker Network?
+ -----------------------
+ Docker gives each container its own isolated network.
+ Containers can talk to each other using networks,
+ and you can also expose them to the host using ports.
+
+# Default Docker networks:
+ ------------------------
+ 1. bridge   → default network for containers
+ 2. host     → container uses host network directly
+ 3. none     → no network access
+
+# List networks
+docker network ls
+
+# Inspect network details (IP, containers connected, gateway, etc.)
+docker network inspect bridge
+
+# my-net = docker network name
+
+# Create a custom network (recommended for multi-container apps)
+docker network create my-net
+
+# Run container in a specific network
+docker run -d --network my-net --name cnt1 xyz
+docker run -d --network my-net --name cnt2 xyz
+
+# How containers communicate?
+# ---------------------------
+# If containers are on the SAME network:
+#   they can reach each other using container names.
+#
+# Example:
+#   Inside cnt1:
+#       ping cnt2
+#   works because Docker provides DNS internally.
+
+# Connect an existing container to a new network
+docker network connect my-net cntId
+
+# Disconnect container from a network
+docker network disconnect my-net cntId
+
+# Notes:
+# ------
+# - bridge network is used by default.
+# - custom networks allow name-based communication.
+# - host port mapping (e.g., 5000:3000) is for accessing container from HOST.
+# - container-to-container communication needs SAME Docker network.
+
+
+# -------------------------------------------
+# Docker Compose (Beginner-Friendly Note)
+# -------------------------------------------
+
+# 1) What is Docker Compose?
+# --------------------------
+# - A tool to run MULTIPLE containers together.
+# - Instead of running many `docker run` commands,
+#   you define everything in ONE file: docker-compose.yml
+# - Then you start all containers with ONE command:
+#       docker compose up
+
+# WHY use Docker Compose?
+# -----------------------
+# - Manage multi-container apps easily (e.g., app + db + redis)
+# - No need to remember long docker run commands
+# - Versions, ports, env vars, volumes all written in YAML
+# - Reproducible: teammates run the same stack
+
+Docker Compose automatically creates a single shared network
+for all services if you don’t explicitly define one.
+
+Service-to-service communication works by service name:
+→ backend can access db using hostname "db".
+
+
+# 2) Basic Structure of docker-compose.yml
+# ----------------------------------------
+# File name must be: docker-compose.yml
+
+version: "3.9"
+
+services:               # all containers go under "services"
+  app:                  # service name (container name)
+    image: node:18
+    container_name: my_app
+    ports:
+      - "5000:3000"     # HOST:CONTAINER
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - ./code:/app     # host_path:container_path
+    networks:
+      - my-net
+
+  redis:
+    image: redis:latest
+    container_name: my_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - my-net
+    volumes:
+      - db-data:/app     # host_path:container_path
+
+networks:
+  my-net:
+
+volumes:
+    db-data     (name of volume not path like ./code and this will be generic for all containers) 
+        driver: local (only for named volumes, not for bind mounts.)
+
+# This defines two containers: "app" and "redis"
+# Both share the same docker network for easy communication.
+# Example: app can connect to redis using hostname "redis".
+
+
+# 3) Common Docker Compose Commands
+ ---------------------------------
+    File path = fileName (or ./docker-compose/fileName)
+
+# Start all services (build if needed)
+docker compose -f fileName up
+
+# Start in background
+docker compose up -d
+
+# Stop containers
+docker compose down
+
+# Rebuild images + start
+docker compose up --build
+
+# View logs for all services
+docker compose logs
+
+# Follow logs
+docker compose logs -f
+
+# View logs for one service
+docker compose logs app
+
+# List containers created by compose
+docker compose ps
+
+# Restart all services
+docker compose restart
+
+# Execute command inside a service container
+docker compose exec app /bin/bash
+# or use /bin/sh if bash not available
+
+# Bring down and remove volumes
+docker compose down -v
+
+
+# 4) How Containers Talk in Compose
+# ---------------------------------
+# If two services are in the SAME compose file:
+# - They automatically share a network
+# - They communicate using service name
+
+# Example:
+# Inside app container:
+#   redis://redis:6379
+# because "redis" is the service name.
+
+
+# 5) Summary
+# ----------
+# Docker Compose =
+#   - multi-container management
+#   - simple YAML config
+#   - easier than running many docker commands
+#
+# Key Commands:
+#   up, down, ps, logs, exec, restart, build
+
+
+# =============================================
+ DOCKERFILE 
+# =============================================
+
+ A Dockerfile is a blueprint that tells Docker
+ how to build an image step-by-step.
+ ---------------------------------------------
+
+# Why Dockerfile?
+ - To create custom images
+ - To package app + dependencies together
+ - To ensure same environment everywhere
+ - To automate builds for CI/CD
+
+# ---------------------------------------------
+ BASIC DOCKERFILE STRUCTURE
+# ---------------------------------------------
+ Example: Node.js app
+
+FROM node:18
+# FROM = base image
+# It is the OS + runtime your app needs.
+
+WORKDIR /app
+# Sets working directory inside container
+
+COPY package*.json ./
+# COPY = copy files from host → container
+
+RUN npm install
+# RUN = execute commands during image build
+
+COPY . .
+# Copy rest of the application code
+
+EXPOSE 3000
+# EXPOSE = document container port
+
+CMD ["node", "server.js"]
+# CMD = command to start the app
+# Only ONE CMD allowed (last CMD is used)
+
+# =============================================
+ DOCKERFILE INSTRUCTIONS 
+# =============================================
+
+# FROM → base image
+FROM ubuntu:22.04
+
+# LABEL → metadata
+LABEL maintainer="you@example.com"
+
+# WORKDIR → like cd inside container
+WORKDIR /usr/src/app
+
+# COPY → copy files into container
+COPY . .
+
+# ADD → same as COPY but also:
+# - can unpack tar
+# - can download remote URLs
+# Prefer COPY over ADD
+ADD files.tar.gz /data/
+
+# RUN → command executed during image build (run command inside container and not on host)
+RUN apt-get update && apt-get install -y curl
+RUN mkdir -p /home/app (make parent directory)
+
+# ENV → set environment variables
+ENV APP_ENV=production
+
+# EXPOSE → document a port (optional)
+EXPOSE 8080
+
+# ENTRYPOINT → fixed command that cannot be overridden easily
+ENTRYPOINT ["python3"]
+
+# CMD → default arguments to ENTRYPOINT OR command to run (only only cmd command and multiple run commands)
+CMD ["app.py"]
+
+-----------------------------------------------
+Multiple FROM ≠ multiple images
+Multiple FROM = multiple stages in 1 image build
+
+Stage 1 (build) → temporary
+Stage 2 (final) → actual image
+
+
+# ---------------------------------------------
+ ENTRYPOINT vs CMD 
+# ---------------------------------------------
+# ENTRYPOINT = main command
+# CMD = arguments to that command
+
+# Example:
+ENTRYPOINT ["ping"]
+CMD ["google.com"]
+# When container runs → ping google.com
+
+# ---------------------------------------------
+ MULTI-STAGE BUILD (to reduce image size)
+# ---------------------------------------------
+# Example: Node build → serve via nginx
+
+---- Build Stage ----
+FROM node:18 AS builder
+WORKDIR /app
+COPY . .
+RUN npm install && npm run build
+
+ ---- Production Stage ----
+FROM nginx:latest
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# ---------------------------------------------
+ .dockerignore (VERY IMPORTANT)
+# ---------------------------------------------
+# Same as .gitignore
+# Prevents unwanted files from being copied
+
+# Example .dockerignore:
+node_modules
+.git
+.env
+*.log
+
+# assume local app folder contains :
+    /app
+ ├── src/
+ ├── package.json
+ ├── Dockerfile
+ ├── docker-compose.yml
+ ├── .dockerignore
+ └── logs/
+
+How Docker Build Works:
+    docker build -t myapp .
+When you run this command:
+
+Step 1 — Docker sends “build context”
+Docker takes ALL files in the current folder (including subfolders)
+and sends them to the Docker daemon for building.
+This is called the build context.
+/app
+ ├── src/
+ ├── package.json
+ ├── Dockerfile
+ ├── docker-compose.yml
+ ├── .dockerignore
+ └── logs/
+
+Step 2 — .dockerignore filters the build context
+Before sending files, Docker first checks .dockerignore.
+Anything listed in .dockerignore is NOT sent to the build context.
+
+Example .dockerignore:
+node_modules
+docker-compose.yml
+Dockerfile.dev
+*.log
+logs/
+.env
+
+That means these items will NOT be copied into the image
+even if you write COPY . . in the Dockerfile.
+
+Your app folder contains:
+Dockerfile
+docker-compose.yml
+.dockerignore
+src/
+
+Let’s assume .dockerignore contains:
+docker-compose.yml
+Dockerfile
+
+Build process:
+docker build -t myapp .
+
+✔ src/ → ❗ included
+✔ .dockerignore → ❗ included in context, but NOT copied to image
+❌ docker-compose.yml → ignored
+❌ Dockerfile → ignored
+❌ Logs / big folders → ignored
+
+Then Dockerfile runs:
+COPY . .
+
+This copies only the filtered files into the image:
+/src   ✔ copied
+/.dockerignore   ❌ NOT copied  
+(other ignored items) ❌ not copied
+
+IMPORTANT
+
+.dockerignore itself is NOT copied to image
+(because Docker automatically excludes it from COPY).
+
+# -----------------------------------------
+# What is Docker Daemon?
+# -----------------------------------------
+
+# Docker Daemon = the background service that:
+#   - builds images
+#   - runs containers
+#   - manages networks & volumes
+#   - stores images on your machine
+
+# You don't interact with daemon directly.
+# You use the "docker" CLI → which sends commands to daemon.
+
+# Example:
+docker build .
+# CLI → sends request → Docker Daemon → builds image
+
+
+# -----------------------------------------
+# What is Docker Build Context?
+# -----------------------------------------
+
+# Build Context = all files/folders sent to the Docker Daemon
+# when you run "docker build".
+
+docker build -t myapp .
+
+# Here:
+# "." = current folder = context
+
+# Docker sends the entire folder (minus .dockerignore files)
+# to the daemon before building.
+
+# Example folder:
+#  app/
+#    src/
+#    package.json
+#    Dockerfile
+#    .dockerignore
+#    logs/
+
+# If logs/ is in .dockerignore → NOT sent to daemon.
+# Only remaining files become the context.
+
+# -----------------------------------------
+# Summary (1 line each)
+# -----------------------------------------
+# Docker Daemon = engine that builds and runs containers
+# Build Context = the files Docker sends to daemon during build
+
+
+# ---------------------------------------------
+ HOW TO BUILD & RUN IMAGE
+# ---------------------------------------------
+
+# Build the image
+docker build -t myapp:1.0 .   (. = path to docker file in this case file in current directory and -t is for tag 1.0)
+
+# Build using a specific Dockerfile
+docker build -t myapp -f Dockerfile.dev .
+
+# Run the container
+docker run -p 3000:3000 myapp
+
+# Delete image by IMAGE ID
+docker rmi imageId
+
+# Delete image by name
+docker rmi imageName
+
+# ---------------------------------------------
+ GOOD PRACTICES (BEGINNER)
+# ---------------------------------------------
+ ✔ Use official base images (node, python, alpine, etc.)
+ ✔ Keep Dockerfile clean & small
+ ✔ Always use .dockerignore
+ ✔ Prefer COPY over ADD
+ ✔ Use multi-stage builds for production
+ ✔ Pin versions (node:18, python:3.10)
+ ✔ Avoid root user when possible
+
+# ---------------------------------------------
+ COMMON DOCKERFILE ERRORS (BEGINNER)
+# ---------------------------------------------
+ ❌ COPY fails → file path wrong
+ ❌ RUN apt-get update without `apt-get install`
+ ❌ Missing .dockerignore causes huge images
+ ❌ Wrong working directory → "file not found"
+ ❌ Exposing wrong port → connection issues
+
+# ---------------------------------------------
+ DOCKERFILE WITH ENV FILES
+# ---------------------------------------------
+# Dockerfile:
+ENV PORT=3000
+
+# Run with env file:
+docker run --env-file .env myapp
+
+# When you make ANY changes in your Dockerfile:
+#   - Docker does NOT overwrite the old image
+#   - You MUST rebuild the image manually
+
+# ---------------------------------------------
+ DOCKERFILE Volumes
+# ---------------------------------------------
+
+Volumes = permanent storage for containers.
+
+Why?
+- Containers are temporary (ephemeral) Due to virtual file system.
+- When a container stops → its internal data is deleted
+- Volumes keep data SAFE even if container is removed
+
+# How it works internally:
+1️⃣ Container writes data to its internal virtual filesystem
+2️⃣ Volume replicates/syncs that data to the HOST filesystem
+3️⃣ Container stops → host data STILL exists (not deleted)
+4️⃣ Container starts again → Docker syncs host data BACK into container
+
+Docker uses a Union File System (UFS) inside the container.
+This filesystem is virtual — it is layered, temporary, and disappears when the container is removed.
+
+A volume is the only part that is NOT virtual.
+It is real storage on your machine.
+
+How a Volume “plugs in” to Host File System
+Host folder (real storage)
+        ↓
+Docker volume driver
+        ↓
+Container path (/data, /usr/share, etc.)
+
+A container has a virtual FS → deleted when container dies.
+
+A volume is a real folder on host → survives.
+
+Docker “mounts” the host folder into container,
+so container thinks it is writing inside itself,
+but actually writing to host.
+
+Docker gives 3 types of storage options:
+1) Host Volumes
+    Host Volume      → you choose host path
+
+    You specify the exact host path.
+    ✔ You control where data is stored
+    ✔ Great for development
+    ✔ Data is easy to view/edit on host
+
+    docker run -v /home/user/data:/data/db xyz
+
+    Left side   = real folder on your machine (/home/user/data)
+    Right side  = folder inside container (/data/db)
+
+
+
+2) Anonymous Volumes
+
+    Anonymous Volume → docker chooses host path (random name)
+
+    You do NOT give a name and do NOT specify host path.
+    ✔ Good for temporary use
+    ❌ Hard to manage/delete
+    ❌ Not good for databases
+    Docker automatically creates a folder somewhere inside: /var/lib/docker/volumes/<random-id>/_data
+
+    docker run -v /data/db xyz
+
+
+
+3) Named Volumes
+
+    Named Volume     → you choose volume name, docker chooses host path
+
+    You give the volume a name, but Docker decides the host path.
+    ✔ Best for databases
+    ✔ Easy to reuse
+    ✔ Easy to move across environments
+
+    docker run -v myvolume:/data/db xyz
+
+    Host location:
+    /var/lib/docker/volumes/myvolume/_data
+
+# This creates a volume → unique for this container only.
+
+# How to create a generic/shared volume for all containers:
+
+Step 1: Create a named volume
+    docker volume create shared_vol
+
+Step 2: Attach it to any container
+    container 1:
+    docker run -d --name c1 -v shared_vol:/app ubuntu
+
+    container 2:
+    docker run -d --name c2 -v shared_vol:/app ubuntu
+
+Both containers now read/write the same filesystem inside /app.
