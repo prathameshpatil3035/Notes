@@ -1,0 +1,2265 @@
+===========================
+🚀 KUBERNETES 
+===========================
+
+# WHAT IS KUBERNETES?
+----------------------
+Kubernetes (K8s) is an open-source system used to:
+- Deploy applications
+- Manage containers
+- Scale applications automatically
+- Handle failures and restarts
+
+In simple words:
+Kubernetes is a platform that manages containerized applications
+(like Docker containers) across many machines.
+
+Think of Kubernetes as:
+"An automated manager for your app containers."
+
+It ensures:
+- Your app is always running
+- Traffic is load-balanced
+- Crashed containers restart automatically
+- You can easily scale up or down
+
+-------------------------------------------------
+
+# WHY DO WE NEED KUBERNETES?
+-----------------------------
+Without Kubernetes:
+- We manually start containers
+- Hard to manage many containers
+- Difficult to scale when load increases
+- No automatic restart on failure
+- No service discovery
+- Hard to update applications without downtime
+
+Kubernetes solves these by:
+- Automating container deployment
+- Automatically restarting failed containers
+- Managing load balancing
+- Scaling apps based on load
+- Updating apps with ZERO downtime (rolling updates)
+- Ensuring desired number of containers always run
+
+-------------------------------------------------
+
+# ADVANTAGES OF KUBERNETES
+---------------------------
+✔ Auto-scaling  
+✔ Load balancing  
+✔ Self-healing (auto restart, reschedule)  
+✔ Rolling updates (zero downtime deployment)  
+✔ Declarative configuration using YAML  
+✔ Works with any cloud (AWS, GCP, Azure, on-prem)  
+✔ Manages thousands of containers easily  
+✔ Service discovery & networking built-in  
+✔ Efficient resource utilization  
+✔ Open-source + huge community support
+
+-------------------------------------------------
+
+# WHEN TO USE KUBERNETES?
+--------------------------
+Use Kubernetes when:
+- You have many microservices
+- Your app needs high availability
+- You want automated deployments & scaling
+- You want cloud-agnostic infrastructure
+- Your workloads run in containers
+
+Not needed for:
+- Very small/simple single-server apps
+- Low-traffic applications
+
+-------------------------------------------------
+
+# SIMPLE FLOW OF HOW KUBERNETES WORKS
+--------------------------------------
+User → Apply YAML (deployment/service)
+Kubernetes → Schedules pods on nodes
+Nodes → Run containers inside pods
+Kubernetes Control Plane → Monitors & maintains desired state
+
+Kubernetes ALWAYS tries to match:
+desired state (what you want) = current state (what is running)
+
+-------------------------------------------------
+
+# BASIC TERMINOLOGY
+--------------------
+Pod       = Smallest unit that runs containers  
+Node      = Machine (VM/Server) where pods run  
+Cluster   = Group of nodes managed by Kubernetes  
+Deployment= Defines how many pods you want  
+Service   = Exposes your app using stable IP/port  
+Kubelet   = Agent running on every node  
+Scheduler = Decides which node runs which pod  
+
+-------------------------------------------------
+# Advantages Of Kebernetes:
+
+- availability or no downtime.
+- scalibility or high performance.
+- disaster recovery backup and restore.
+
+===============================
+🚀 KUBERNETES – CORE COMPONENTS
+===============================
+
+1. NODE
+-------
+- A Node is a **virtual machine (VM)** or physical machine.
+- Kubernetes runs your workloads on Nodes.
+- Each Node contains:
+  - Kubelet (agent)
+  - Container runtime (Docker, containerd)
+  - Kube-proxy
+- Multiple Nodes together form a **Cluster**.
+
+---------------------------------------------------
+
+2. POD
+------
+- Smallest unit in Kubernetes.
+- A Pod is an **abstraction over a container**.
+- Usually **1 application = 1 Pod** (best practice).
+- A Pod gets its **own IP address**.
+- When a Pod is recreated, it gets a **new IP address**.
+- Pods are temporary (ephemeral), so their IPs are not stable.
+
+---------------------------------------------------
+
+3. SERVICE
+----------
+- A Service provides a **static / permanent IP address**.
+- It abstracts and exposes Pods.
+- Even if Pods restart or get new IPs, the Service IP stays the same.
+- **Pod lifecycle and Service lifecycle are NOT connected.**
+- Services allow stable communication between:
+  - Internal components
+  - External users (if configured)
+- Pods communicate each other using service
+
+TYPES OF SERVICES:
+------------------
+a) **Internal Service (ClusterIP)**  
+   - Default  
+   - Not accessible from outside the cluster  
+   - Used for internal communication (e.g., backend ↔ database)
+
+b) **External Service (NodePort / LoadBalancer)**  
+   - Opens communication to external sources  
+   - Makes the app accessible through browser  
+   - Used when outside users need network access
+
+---------------------------------------------------
+
+4. INGRESS
+----------
+- Ingress is an intelligent **HTTP/HTTPS router**.
+- External request first goes to **Ingress**, then forwarded to the **Service**.
+- Instead of accessing apps like:
+    http://121.0.0.23:8080  (Pod/Node IP)
+  We can access them using friendly domain names:
+    https://my-app.com
+
+- Ingress helps with:
+  ✔ Domain routing  
+  ✔ TLS/HTTPS  
+  ✔ Path-based routing  
+  ✔ Load balancing  
+
+---------------------------------------------------
+🌐 SIMPLE REQUEST FLOW
+----------------------
+Browser → Ingress → Service → Pod → Container
+---------------------------------------------------
+
+# 🔥 What is Ingress?
+# Ingress is a Kubernetes component that exposes HTTP/HTTPS routes
+# from outside the cluster to internal services.
+# ➜ It enables access through a single entrypoint (domain).
+# ➜ Supports URL-based routing and host-based routing.
+# ➜ Handles HTTPS termination using TLS certificates.
+
+# ⚡ Why use Ingress?
+# • Instead of exposing every service as LoadBalancer/NodePort, we expose only Ingress.
+# • All external requests → Ingress → correct Service → Pod.
+# • Improves security, cost (no multiple LoadBalancers), and routing flexibility.
+
+# 🚀 What is Ingress Controller?
+# Ingress Controller evaluates and processes ingress rules.
+# It is required to run Kubernetes Ingress (Ingress alone will not work).
+# It listens to ingress objects and manages routing.
+# Example implementations:
+# • NGINX Ingress Controller (most common)
+# • AWS ALB Ingress Controller
+# • Traefik
+# • HAProxy
+# • Istio Gateway
+# Kubernetes does NOT include a controller by default.
+
+# ⭐ Why first service is kept internal?
+# Even if we want public access, we keep the service type internal (ClusterIP).
+# Public access should come only through Ingress → ensures centralized routing & security.
+
+# 🧱 Ingress Default Backend
+# • A service+pod that receives traffic when request does NOT match any rule.
+# • Useful for custom 404/invalid path/error pages.
+
+################################################
+# 👇 FULL EXAMPLE — Deployment + Services + Ingress
+################################################
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: journey-app
+  labels:
+    app: journey-app
+spec:
+  containers:
+    - name: journey-app
+      image: nginx
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: journey-service-internal
+spec:
+  type: ClusterIP     # internal service
+  selector:
+    app: journey-app
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: default-error-page
+  labels:
+    app: default-error
+spec:
+  containers:
+    - name: default-error
+      image: httpd
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: default-backend
+spec:
+  type: ClusterIP
+  selector:
+    app: default-error
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: journey-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx        # handled by nginx ingress controller
+spec:
+  defaultBackend:                             # for unmatched paths
+    service:
+      name: default-backend
+      port:
+        number: 80
+
+  tls:
+    - hosts:
+        - journey.freighttiger.com
+      secretName: tls-secret                   # contains TLS certificate + key
+
+  rules:
+    # ① Routing using same domain with multiple paths
+    - host: journey.freighttiger.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: journey-service-internal
+                port:
+                  number: 80
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: journey-service-internal
+                port:
+                  number: 80
+
+    # ② Multiple domains (host-based routing)
+    - host: reporting.freighttiger.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: journey-service-internal
+                port:
+                  number: 80
+
+    # ③ Subdomain example
+    - host: api.journey.freighttiger.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: journey-service-internal
+                port:
+                  number: 80
+
+
+################################################
+# 🔑 TLS Certificates (Used in Ingress)
+# • Provides HTTPS URLs (secure encryption)
+# • Stored as Kubernetes Secret type: tls
+#
+# Usage: Ingress reads secret and enables HTTPS termination.
+################################################
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tls-secret
+type: kubernetes.io/tls
+data:
+  tls.crt: <base64 encoded certificate>
+  tls.key: <base64 encoded private key>
+
+################################################
+# 📌 Summary (Important):
+# • Service stays internal (ClusterIP) →
+#   requests must always go through Ingress.
+# • Ingress Controller must exist → without it ingress rules don't work.
+# • Default backend handles unmatched paths.
+# • TLS adds HTTPS security.
+################################################
+
+
+5. CONFIGMAP
+------------
+- A ConfigMap stores **external configuration** for your application.
+- It helps avoid rebuilding Docker images just to change:
+  ✔ URLs  
+  ✔ Environment variables  
+  ✔ File-based configs  
+
+Why needed?
+-----------
+Without ConfigMap:
+- Changing an environment variable means:
+  → Update code → Rebuild Docker image → Push image → Deploy again
+
+With ConfigMap:
+- Just update ConfigMap → Pod picks new config (with restart) → Done
+
+Key points:
+-----------
+- Not for sensitive/secret data.
+- ConfigMap stores data in **plain text**.
+- Typically used for:
+  - API URLs
+  - Feature flags
+  - Application configs
+  - Port numbers
+  - File-based config templates
+
+---------------------------------------------------
+
+6. SECRET
+---------
+- A Secret stores **sensitive information** like:
+  ✔ Passwords  
+  ✔ Tokens  
+  ✔ API keys  
+  ✔ Certificates  
+
+Why not use ConfigMap for secrets?
+----------------------------------
+- ConfigMaps store values in plain text (NOT secure).
+
+Secret vs ConfigMap:
+--------------------
+- Secret is similar to a ConfigMap but specifically designed for **sensitive data**.
+- Secret values are stored in **Base64 encoded** format.
+
+Note:
+-----
+- Base64 ≠ Encryption  
+  (It is only encoding, but prevents accidental viewing.)
+- Kubernetes supports stronger encryption, but:
+  **Built-in encryption at rest is NOT enabled by default**.
+  (Cluster admins must enable it.)
+
+---------------------------------------------------
+
+HOW TO USE CONFIGMAP OR SECRET IN APPLICATIONS
+-------------------------------------------------
+
+You can use them in your Pods as:
+
+A) **Environment Variables**  
+   Example:
+   - APP_URL from ConfigMap  
+   - DB_PASSWORD from Secret  
+
+B) **Mounted Volume / Properties File**  
+   Example:
+   - ConfigMap → config.json  
+   - Secret → credentials.properties  
+
+Applications read these values at runtime without changing Docker image.
+
+---------------------------------------------------
+
+SIMPLE RULE
+--------------
+- Use **ConfigMap** for NON-sensitive config.  
+- Use **Secret** for sensitive data.  
+- Both can be injected into Pods as:
+  ✔ env variables  
+  ✔ config files via volumes  
+
+---------------------------------------------------
+7. KUBERNETES – VOLUMES
+---------------------------------------------------
+
+1. WHY DO WE NEED VOLUMES?
+--------------------------
+- By default, data inside a Pod is **temporary**.
+- If a Pod restarts or is recreated, all data is **lost**.
+- Applications like:
+  ✔ Databases  
+  ✔ File upload servers  
+  ✔ Caches  
+  ✔ Log storage  
+  need **persistent data**.
+
+So Kubernetes provides **Volumes** to store data outside the Pod.
+
+---------------------------------------------------------
+
+2. WHAT IS A KUBERNETES VOLUME?
+-------------------------------
+- A Volume is storage that can be **attached to a Pod**.
+- The storage can come from:
+  ✔ Local machine (Node's hard drive)  
+  ✔ Remote storage outside the cluster  
+  ✔ Cloud storage (AWS EBS, Azure Disk, GCP Persistent Disk)  
+
+- The Volume stays safe even if the Pod crashes.
+
+---------------------------------------------------------
+
+3. IMPORTANT POINT
+------------------
+❗ Kubernetes itself **DOES NOT manage data persistence**.  
+It can *attach* storage but does not:
+- Replicate data  
+- Backup data  
+- Guarantee storage safety
+
+Persistence is handled by:
+- Cloud providers  
+- External storage systems  
+- Storage classes and provisioners  
+
+Kubernetes only **mounts** storage to the Pod.
+
+---------------------------------------------------------
+
+4. TYPES OF STORAGE (Simplified)
+---------------------------------
+
+A) **Local Volume**
+   - Stored on Node’s physical hard drive.
+   - Pod data persists ONLY as long as the Node exists.
+   - If Node dies → data gone.
+
+B) **Remote / Network Storage (Better)**
+   - Exists outside the Kubernetes cluster.
+   - Examples:
+     ✔ NFS  
+     ✔ SAN  
+     ✔ Cloud disk (EBS, GCP PD, Azure Disk)
+   - Persistent regardless of Pod/Node failures.
+
+C) **Cloud Storage**
+   - Most reliable option.
+   - When Pod moves to another Node, storage can follow.
+
+---------------------------------------------------------
+
+5. USAGE
+--------
+A Volume is mounted into a Pod as a directory, e.g.:
+
+/app/data → stored in a Volume  
+/app/logs → stored in a Volume  
+
+Applications read/write data normally.
+
+---------------------------------------------------------
+
+6. SIMPLE SUMMARY
+-----------------
+- Pod data disappears on restart → use Volume.
+- Volume = external storage attached to Pod.
+- Storage can be:
+  ✔ Local  
+  ✔ Remote  
+  ✔ Cloud  
+- Kubernetes **attaches** storage but does not manage data persistence.
+
+---------------------------------------------------------
+
+-----------------------------
+#WHY MULTIPLE PODS (REPLICAS)?
+--------------------------------
+- Pods can crash anytime.
+- When a Pod restarts, it gets a **new IP address**.
+- To keep the app running, we create **multiple replicas** of the Pod.
+
+Example:
+Pod A (crashed) → new Pod A' created  
+Pod A' has a **different IP**.
+
+So how does the user access the app consistently?
+
+→ A **Service** provides a fixed/stable IP  
+→ It load-balances traffic to all Pod replicas  
+→ Domain name stays the same
+
+FLOW:
+Browser → Service → Pod replicas (load balanced)
+
+----------------------------------------------------
+
+2. STATELESS vs STATEFUL APPLICATIONS
+-------------------------------------
+
+A) STATELESS APPLICATIONS
+-------------------------
+- Do not store data inside the Pod.
+- Even if the Pod is deleted, no important data is lost.
+- Any replica can serve any request.
+
+Examples:
+✔ Backend APIs  
+✔ Frontend apps  
+✔ Microservices  
+✔ Authentication services  
+✔ Worker jobs  
+
+Best for Kubernetes:
+✔ Easy scaling  
+✔ Easy replication  
+✔ Easy recovery  
+✔ Zero data consistency issues  
+
+-----------------------------------------------------
+
+B) STATEFUL APPLICATIONS
+-------------------------
+- Store or manage data (state) internally.
+- Each Pod needs a fixed identity.
+- You cannot randomly copy them without handling consistency.
+
+Examples:
+✔ Databases (MongoDB, PostgreSQL, MySQL)
+✔ Queues (Kafka, RabbitMQ)
+✔ Distributed storage systems (Elasticsearch, MinIO)
+
+Challenges:
+- Node failures can corrupt data.
+- Pods need stable network identity.
+- Writes must be synchronized.
+- Data consistency must be managed.
+
+These apps are much harder to run inside Kubernetes.
+
+-----------------------------------------------------
+
+8. DEPLOYMENT
+-------------
+- A Deployment is a **blueprint** for Pods.
+- You do NOT manually create Pod replicas.
+- You define:
+  ✔ Pod template  
+  ✔ Number of replicas  
+  ✔ Container image  
+  ✔ Environment variables  
+  ✔ ConfigMaps / Secrets  
+  ✔ Rolling updates  
+
+Deployment Responsibilities:
+----------------------------
+- Create pods  
+- Maintain replica count  
+- Restart crashed pods  
+- Scale up/down pods  
+- Rolling updates with zero downtime  
+
+What deployments are NOT good for:
+----------------------------------
+- Databases or stateful apps  
+- Anything needing fixed identity (Pod-0, Pod-1, Pod-2)  
+- Apps requiring synchronized writes  
+
+-----------------------------------------------------
+
+WHY DATABASE CANNOT BE REPLICATED USING DEPLOYMENT?
+------------------------------------------------------
+Because deployments create **identical, interchangeable pods**.
+
+Databases need:
+- A defined leader (primary)  
+- Synchronized read/write replicas  
+- Stable Pod identity  
+- Persistent volumes tied to specific Pods  
+
+Deployment cannot guarantee:
+❌ Which replica writes  
+❌ Which replica reads  
+❌ Order of writes  
+❌ Consistency between replicas
+
+This causes **data inconsistency**.
+
+-----------------------------------------------------
+
+9. STATEFULSET
+---------------
+- A StatefulSet is designed for **stateful applications**.
+- It gives each Pod:
+  ✔ A fixed name (pod-0, pod-1, pod-2)  
+  ✔ A stable network identity  
+  ✔ A stable volume that attaches to that Pod  
+  ✔ Ordered start (0 → 1 → 2)  
+  ✔ Ordered termination and scaling  
+
+Why needed?
+------------
+- Databases require that reads and writes are synchronized.
+- StatefulSet ensures correct ordering and identity.
+
+BUT:
+- Running databases in Kubernetes is complicated.
+- You must manually manage:
+  ✔ Replication  
+  ✔ Backup  
+  ✔ Failover  
+  ✔ Consistency  
+
+This is why…
+
+-----------------------------------------------------
+
+# COMMON PRACTICE IN REAL WORLD
+--------------------------------
+Most companies DO NOT run databases inside Kubernetes.
+
+The usual approach:
+- Deploy **stateless apps** with Deployments.
+- Keep **databases outside the cluster**, like:
+  ✔ AWS RDS  
+  ✔ Azure Database  
+  ✔ Google Cloud SQL  
+  ✔ On-prem / external server  
+
+Apps inside Kubernetes communicate with the **external DB**.
+
+Benefits:
+---------
+✔ Less risk of data inconsistency  
+✔ Databases handled by specialized infrastructure  
+✔ Easier scaling of both apps and DBs  
+✔ High reliability  
+
+-----------------------------------------------------
+
+============================
+10. KUBERNETES – CLUSTER
+============================
+
+1. WHAT IS A KUBERNETES CLUSTER?
+--------------------------------
+A Kubernetes Cluster is a group of machines (Nodes) where Kubernetes
+runs and manages your applications.
+
+A Cluster = 
+  ✔ Control Plane (brain)
+  ✔ Worker Nodes (machines that run your Pods)
+
+All together they form one managed system called a “cluster”.
+
+------------------------------------------------------------
+
+2. WHY DO WE NEED A CLUSTER?
+-----------------------------
+- To run containerized applications across multiple machines.
+- To scale applications horizontally.
+- To keep apps highly available even if one machine fails.
+- To manage workloads automatically (pods, deployments, services, etc.)
+- To balance load and handle failures.
+
+------------------------------------------------------------
+
+3. COMPONENTS INSIDE A CLUSTER
+-------------------------------
+
+A Kubernetes Cluster has two main parts:
+
+A) **Control Plane (Master Components)**
+   - Makes decisions for the cluster.
+   - Maintains desired state.
+   - Schedules pods on nodes.
+   - Key components:
+     ✔ API Server  
+     ✔ Scheduler  
+     ✔ Controller Manager  
+     ✔ etcd (stores cluster state)
+
+B) **Worker Nodes**
+   - Actual machines (VMs) that run your containerized applications.
+   - Each Node runs:
+     ✔ Kubelet  
+     ✔ Kube-Proxy  
+     ✔ Container Runtime (Docker / containerd)
+   - Pods are created here.
+
+------------------------------------------------------------
+
+4. HOW THE CLUSTER WORKS
+------------------------
+- User applies YAML using `kubectl`.
+- API Server receives the request.
+- Scheduler decides which Node will run the Pod.
+- Kubelet on that Node creates the Pod.
+- Cluster continuously monitors and corrects the state.
+
+Cluster always ensures:
+**desired state = actual state**
+
+------------------------------------------------------------
+
+5. SIMPLE DEFINITION
+--------------------
+A Kubernetes Cluster is a group of connected machines that:
+  ✔ run containers  
+  ✔ manage deployments  
+  ✔ auto-scale apps  
+  ✔ handle failures  
+  ✔ maintain application availability  
+
+============================
+10. KUBERNETES – Namespace
+============================
+
+Namespace in Kubernetes is like a folder inside a cluster.
+It helps divide cluster resources between different teams, environments, or projects.
+
+Why we use namespace:
+- To separate resources (dev, qa, prod)
+- To avoid name conflicts (same service name can exist in different namespaces)
+- To apply access control or resource limits per group
+
+Examples from real usage:
+- dev namespace → developer deployment
+- qa namespace → testing deployment
+- prod namespace → live customer deployment
+
+Important point:
+If no namespace is mentioned, Kubernetes uses the default namespace.
+
+# 📌 Kubernetes NAMESPACE — Beginner Friendly Notes
+
+# 👉 What is a Namespace?
+# Namespace = virtual cluster inside a Kubernetes cluster.
+# It organizes and isolates resources logically.
+# Example: teams/environments can use separate namespaces (dev, staging, prod).
+
+# 👉 Why use Namespace?
+# - Organize resources by teams/modules/env (dev, staging, prod…)
+# - Prevent name conflicts (two deployments with same name but different teams)
+# - Resource sharing possible in some cases (services can be accessed across namespaces)
+# - Resource limits per namespace (CPU/Memory quotas)
+# - Blue/Green deployments in parallel using namespaces
+# - Security: access control (RBAC) can restrict namespace access
+
+# 👉 Characteristics of Namespaces
+# - You CANNOT directly access most resources from another namespace.
+#   Example: ConfigMap is namespace-scoped → each namespace requires its own ConfigMap.
+# - SOME resources are GLOBAL and not tied to namespaces:
+#   ❌ Nodes
+#   ❌ PersistentVolumes
+#   ❌ StorageClass
+#   ❌ ClusterRole
+#   ❌ ClusterRoleBinding
+# - Services CAN be accessed across namespaces using the fully qualified service name:
+#   <service-name>.<namespace>.svc.cluster.local
+#   Example used in ConfigMap:
+#   API_URL: "http://backend-service.prod.svc.cluster.local"
+
+# 👉 If you DO NOT define namespace in YAML, resource is created in "default" namespace.
+# 👉 kubectl uses "default" namespace automatically unless changed.
+
+# 👉 Kubernetes Default Namespaces
+# default              → user workloads when namespace not specified
+# kube-system          → system components (scheduler, kube-dns, etc)
+# kube-public          → public readable resources (cluster info)
+# kube-node-lease      → node heartbeat leases
+# kubernetes-dashboard → namespace for dashboard add-on (if installed)
+
+# ---------------------------------------------------------------------------------------
+# ⚙️ Example: Namespace Configuration File (name: prod)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prod
+---
+# Example Deployment inside namespace `prod`
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: journey-service
+  namespace: prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: journey-service
+  template:
+    metadata:
+      labels:
+        app: journey-service
+    spec:
+      containers:
+        - name: journey-service
+          image: sample-image:latest
+          env:
+            - name: API_URL
+              value: "http://backend-service.prod.svc.cluster.local"   # service cross-namespace URL example
+---
+# Example ConfigMap in same namespace (namespace-scoped)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: journey-config
+  namespace: prod
+data:
+  mode: "production"
+---
+# Example Service in namespace prod
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: prod
+spec:
+  type: ClusterIP
+  selector:
+    app: journey-service
+  ports:
+    - port: 8080
+      targetPort: 8080
+
+# ---------------------------------------------------------------------------------------
+# ▶ kubectl commands related to namespaces
+# View namespaces:
+#   kubectl get namespaces
+# Create namespace:
+#   kubectl apply -f namespace.yaml
+# View resources inside a namespace:
+#   kubectl get all -n prod
+# Delete namespace (deletes all resources inside it):
+#   kubectl delete namespace prod
+
+# ---------------------------------------------------------------------------------------
+# 🔥 KUBENES (Kubectl Namespace Switcher)
+# What is kubenes?
+#   kubenes is a CLI tool to easily switch active namespace for kubectl.
+# Why use?
+#   So you don’t need to type "-n namespace" in every command.
+# Usage example:
+#   kubenes list                → list all namespaces
+#   kubenes set prod            → set active namespace to prod
+# After switching → kubectl commands run automatically in prod namespace
+
+# Example:
+#   kubenes set staging
+#   kubectl get pods   # will run in staging namespace without -n staging
+
+# ---------------------------------------------------------------------------------------
+# 🧠 Summary
+# Namespace = logical partition of Kubernetes resources.
+# Helps organization, security, resource limits, and multi-environment management.
+# Some resources are namespace-scoped (Deployment, Pod, ConfigMap, Secret, Service).
+# Some resources are global (Nodes, PV, StorageClass, ClusterRole).
+# Tools like kubenes make namespace switching easy.
+
+===================
+11. KUBERNETES USER 
+===================
+
+• A Kubernetes User means **an identity that interacts with the Kubernetes cluster**.
+• A user is usually a **human** (developer, admin, DevOps engineer) who runs kubectl commands or accesses dashboards/APIs.
+• Kubernetes does NOT store user accounts internally. It relies on **external systems** for user authentication (e.g., certificates, OAuth, SSO, LDAP, cloud IAM).
+• Every user is identified using **credentials** (client certificates / tokens / access keys) and authenticated before accessing the cluster.
+• Once authenticated, the user receives **authorization** based on RBAC (Role-Based Access Control) — defines what user **can** or **cannot** do (view pods, delete deployment, scale app, etc.).
+• Example: 
+  - Developer user → allowed to deploy and view logs only
+  - Admin user → full access to the cluster
+• Users can be **assigned to a specific namespace** to restrict access to resources of other teams.
+• Service accounts ≠ Users:
+  - Users → Humans
+  - Service Accounts → Apps / Pods inside cluster
+
+============================
+12. Kubernetes Administrator
+============================
+
+Who is a Kubernetes Administrator?
+• A person responsible for managing and operating Kubernetes clusters in production.
+
+Key Responsibilities:
+• Install, upgrade, and maintain Kubernetes clusters.
+• Manage cluster infrastructure, nodes, and networking.
+• Ensure security: authentication, authorization, role-based access (RBAC).
+• Manage namespaces, resource quotas, and limit ranges.
+• Configure and monitor cluster components (API server, Controller manager, Scheduler, Kubelet, Kube-proxy, etc.)
+• Handle storage configuration (PV, PVC, Storage Classes).
+• Deploy and maintain Ingress controllers, load balancers, DNS.
+• Monitor and troubleshoot cluster performance and logs.
+• Backup & disaster recovery (ETCD backup).
+• Manage updates and high availability.
+• Ensure reliability, autoscaling, and cost optimization.
+
+Required Skills:
+• Strong Linux fundamentals.
+• Networking concepts (DNS, Load Balancers, Services in K8s).
+• YAML and Kubernetes objects (Pod, Deployment, Service, etc.)
+• Security fundamentals (TLS, Secrets, Network Policies).
+• Observability tools (kubectl logs, metrics, monitoring dashboards).
+• Container runtime knowledge (Docker, containerd).
+• Cloud platforms familiarity (AWS, GCP, Azure).
+• CI/CD basics.
+
+Popular Tools for Admins:
+• kubectl (primary CLI tool)
+• Helm (package manager)
+• Kubeadm / managed Kubernetes (EKS, GKE, AKS)
+• Prometheus + Grafana for monitoring
+• K9s for terminal-based cluster management
+• ETCDCTL for ETCD operations
+
+► Daily tasks:
+  • Manage cluster nodes and workloads
+  • Apply & review manifests provided by DevOps / Developers
+  • Ensure security + compliance of cluster resources
+  • Scale and optimize resource usage
+  • Maintain cluster addons (metrics server, ingress, dashboards, CNI, CSI)
+  • Support deployments and debugging for applications running on Kubernetes
+
+
+Why this role is important:
+• Ensures Kubernetes clusters run securely, efficiently, and without downtime.
+• Maintains infrastructure that supports applications for developers and users.
+
+Goal:
+• Provide a reliable, scalable, secure platform for containerized applications.
+
+
+------------------------------------------------------------
+
+=========================================
+🚀 KUBERNETES ARCHITECTURE 
+=========================================
+
+Kubernetes architecture has **2 types of nodes**:
+1. Master Node
+2. Worker/Slave Node
+
+=========================================
+1. WORKER / SLAVE NODE
+=========================================
+- Each worker node runs **multiple pods**.
+- 3 processes must be installed on every worker node to schedule and manage pods:
+
+-----------------------------------------
+A) CONTAINER RUNTIME
+-----------------------------------------
+- Example: Docker, containerd.
+- Since applications run inside containers, the worker node needs a container runtime installed.
+- It starts and runs the actual containers inside pods.
+
+-----------------------------------------
+B) KUBELET
+-----------------------------------------
+- Process that schedules and manages pods/containers on the node.
+- Kubelet interfaces with both:
+  ✔ Container runtime  
+  ✔ Master node  
+- Kubelet starts the pod with containers inside it.
+- It assigns node resources (CPU, RAM, storage) to the container.
+- Executes scheduling decisions received from the scheduler.
+
+-----------------------------------------
+C) KUBE-PROXY
+-----------------------------------------
+- Must be installed on every worker node.
+- Responsible for forwarding requests from **Service → Pod**.
+- Handles networking and load balancing inside the cluster.
+- Has intelligent forwarding logic:
+  Example:
+  - If an app requests the DB app, kube-proxy tries to route request to the DB pod **on the same node** (if available)  
+    → reduces network overhead  
+  - If not available locally, it forwards to another node.
+
+-----------------------------------------
+Worker nodes do the actual work of:
+- Running pods
+- Hosting containers
+- Running replicas of existing pods
+
+=========================================
+2. MASTER NODE (CONTROL PLANE)
+=========================================
+Master node runs 4 critical processes:
+
+-----------------------------------------
+1. API SERVER
+-----------------------------------------
+- Entry point to the entire cluster.
+- Users interact with API server using:
+  ✔ UI (K8s Dashboard)  
+  ✔ CLI tools (kubectl)  
+  ✔ Kubernetes API  
+- API server receives all requests for:
+  - Deploying apps
+  - Creating pods or services
+  - Scaling applications
+  - Querying cluster health or deployment status
+- Acts as **gatekeeper**, checking authentication & authorization.
+- Forwards valid requests to other master components.
+
+-----------------------------------------
+2. SCHEDULER
+-----------------------------------------
+- Decides **which worker node** will run the new pod.
+- Looks at available CPU, RAM, and other resources on each node.
+- Picks the **least busy / most suitable node**.
+- Sends scheduling request to kubelet on that worker node.
+
+-----------------------------------------
+3. CONTROLLER MANAGER
+-----------------------------------------
+- Continuously detects cluster state changes.
+- If a pod crashes:
+  → It requests scheduler to re-create the pod.
+- Ensures the cluster always matches the **desired state**.
+- Works to recover cluster state as quickly as possible.
+
+-----------------------------------------
+4. ETCD (KEY-VALUE STORE)
+-----------------------------------------
+- Stores the **entire cluster state**.
+- Every change in cluster (new pod, pod crash, restart) is saved in etcd.
+- It is like the **brain of the cluster**.
+- Master processes refer to etcd for:
+  ✔ Resource availability  
+  ✔ Node health  
+  ✔ Pod statuses  
+  ✔ Deployment status  
+- Note:
+  - etcd **does NOT store application database data**.  
+  - It only stores **cluster metadata/state**.
+
+=========================================
+MULTIPLE MASTER NODES
+=========================================
+- Master processes are crucial for cluster operations.
+- Especially etcd must be stored reliably and replicated.
+- Hence real clusters usually have **multiple master nodes**.
+- Each master runs all the master processes.
+
+=========================================
+MASTER NODE VS WORKER NODE RESOURCES
+=========================================
+- **Worker nodes** require more CPU/RAM because they run actual pods/containers.
+- **Master nodes** are more important but run lighter workloads (control processes).
+
+=========================================
+SCALING THE CLUSTER
+=========================================
+As application complexity and resource demand increases, you can add more:
+- Master nodes  
+- Worker nodes  
+
+This makes the Kubernetes cluster more powerful and robust.
+
+=========================================
+HOW TO ADD NEW MASTER OR WORKER NODE
+=========================================
+1. Get a new bare server.
+2. Install the required master/worker processes on it.
+3. Join it to the cluster.
+
+You can scale the cluster infinitely as your application grows.
+
+===========
+1. MINIKUBE
+-----------
+- Minikube is a tool to run Kubernetes **locally** on your laptop/PC.
+- It creates a **single-node Kubernetes cluster** for learning/testing.
+
+Important point:
+----------------
+MINIKUBE has **master node + worker node both inside the same Virtual Machine**.  
+So it is a **single-node cluster** (master + slave combined).
+
+Where does Minikube run?
+------------------------
+MINIKUBE runs **inside a Virtual Machine**:
+  ✔ VirtualBox  
+  ✔ Hyper-V  
+  ✔ Docker driver  
+  ✔ Any supported VM driver  
+
+Basically, Minikube creates a VM on your PC → inside that VM it installs Kubernetes.
+
+Why is Minikube used?
+---------------------
+- To practice Kubernetes locally.
+- To deploy small apps for learning.
+- To test K8s resources (pods, deployments, services, ingress, etc.).
+- No cloud required (AWS/GCP/Azure not needed).
+
+Common Minikube Commands:
+-------------------------
+minikube start          → start the cluster  
+minikube stop           → stop the cluster  
+minikube delete         → delete the cluster  
+minikube dashboard      → open K8s UI  
+
+---------------------------------------------------
+
+2. KUBECTL (Kubernetes Command Line)
+------------------------------------
+- kubectl is the **command-line tool** used to interact with the Kubernetes cluster.
+- You use kubectl to talk to the Kubernetes **API Server**.
+
+What can kubectl do?
+--------------------
+✔ Deploy apps  
+✔ Create/delete pods, deployments, services  
+✔ Check logs  
+✔ Get cluster info  
+✔ Apply yaml files  
+✔ Debug issues  
+
+Examples:
+---------
+kubectl get pods  
+kubectl get deployments  
+kubectl get services  
+kubectl describe pod <pod-name>  
+kubectl logs <pod-name>  
+kubectl apply -f app.yaml  
+kubectl delete -f app.yaml  
+
+kubectl + Minikube:
+-------------------
+When Minikube starts, it automatically configures kubectl to point to the Minikube cluster.
+---------------------------------------------------
+1. Minikube itself is NOT a virtual machine.
+--------------------------------------------
+- Minikube is a **tool** that CREATES and MANAGES a virtual machine.
+- It does NOT run containers directly on your operating system.
+- Instead, it needs a **hypervisor** to create a VM.
+
+--------------------------------------------------
+
+2. What is VirtualBox?
+-----------------------
+- VirtualBox is a **hypervisor**.
+- It is responsible for actually creating and running a virtual machine.
+- Minikube uses VirtualBox (or Docker, or Hyper-V, etc.) as a backend to run Kubernetes.
+
+--------------------------------------------------
+
+3. Why does Minikube need VirtualBox?
+--------------------------------------
+Because Minikube cannot create a VM by itself.
+
+Minikube only:
+✔ Sets up Kubernetes  
+✔ Installs master + worker components  
+✔ Configures cluster networking  
+✔ Starts kubelet, kube-proxy, API server, etc.  
+
+But **it needs a hypervisor to create the virtual machine where Kubernetes will run**.
+
+VirtualBox does:
+✔ Create the VM  
+✔ Allocate CPU/RAM  
+✔ Provide virtualization  
+✔ Boot Linux inside the VM  
+
+Minikube does:
+✔ Install Kubernetes inside that VM  
+✔ Start the cluster  
+
+--------------------------------------------------
+
+4. So what actually happens?
+----------------------------
+
+Your PC  
+   ↓  
+VirtualBox (hypervisor) → creates a VM  
+   ↓  
+Minikube → installs Kubernetes inside that VM  
+   ↓  
+The VM becomes your **single-node** Kubernetes cluster.
+
+--------------------------------------------------
+
+5. IMPORTANT CLARIFICATION
+--------------------------
+- Minikube is NOT itself a VM.
+- The VM is created BY Minikube USING VirtualBox (or another driver).
+
+So:
+Minikube = tool  
+VirtualBox = virtual machine provider  
+Kubernetes = runs *inside* that VM  
+
+--------------------------------------------------
+
+6. Alternative hypervisors Minikube supports:
+---------------------------------------------
+- Docker (most commonly used today)
+- Hyper-V
+- VirtualBox
+- VMware
+- KVM (Linux)
+
+If Docker is installed, Minikube can run WITHOUT VirtualBox:
+minikube start --driver=docker
+
+--------------------------------------------------
+MINIKUBE CAN RUN USING DIFFERENT "DRIVERS"
+----------------------------------------------
+A **driver** = the hypervisor/engine used to create the VM.
+
+Examples of drivers:
+- VirtualBox
+- VMware
+- Hyper-V
+- Docker
+- KVM
+- None (bare-metal mode, Linux only)
+
+Minikube works depending on which driver you choose.
+
+------------------------------------------------------
+
+WHY MINIKUBE USED TO NEED VIRTUALBOX?
+----------------------------------------
+Earlier:
+- Minikube could ONLY run inside a VM.
+- So users needed a hypervisor like **VirtualBox**.
+
+Reason:
+- Kubernetes needs Linux kernel features (cgroups, namespaces, etc.)
+- Windows/Mac do not have these features natively
+- So Minikube created a **Linux VM** inside VirtualBox → cluster runs there
+
+------------------------------------------------------
+
+IF DOCKER IS INSTALLED → MINIKUBE CAN RUN WITHOUT VIRTUALBOX
+----------------------------------------------------------------
+Docker Desktop has:
+- A built-in lightweight Linux VM
+- This VM already supports container runtime features
+- Minikube reuses Docker’s internal VM as the hypervisor
+
+So:
+Minikube driver = docker  
+(since Docker's VM → acts like the required Linux machine)
+
+This removes the need for VirtualBox.
+
+------------------------------------------------------
+
+MINIKUBE IS *NOT* A VM → MINIKUBE *CREATES* A VM
+---------------------------------------------------
+Common confusion:
+- Minikube itself is not the VM  
+- Minikube is a **tool** that creates and manages a VM
+
+If you choose VirtualBox:
+  Minikube → asks VirtualBox to create a Linux VM → runs K8s inside it
+
+If you choose Docker:
+  Minikube → uses Docker’s internal VM → runs K8s inside it
+
+------------------------------------------------------
+
+WHY MINIKUBE NEEDS A HYPERVISOR / VM AT ALL?
+-----------------------------------------------
+Because Kubernetes needs:
+- Linux kernel features  
+- container runtime  
+- network drivers  
+- cgroups, namespaces, iptables  
+
+Your Windows/Mac host cannot directly provide these.
+
+The VM provides a “mini Linux server”.
+
+------------------------------------------------------
+
+SUMMARY
+----------
+- Minikube = tool to run Kubernetes locally  
+- It creates a small Linux VM to run master + worker in one place  
+- VirtualBox is one option to run that VM  
+- If Docker is installed → Docker itself acts as the VM  
+- So no extra VirtualBox is needed  
+
+=================
+Kubectl Commands
+=================
+
+=========================================
+🚀 KUBERNETES COMMANDS + NOTES (BEGINNER)
+=========================================
+
+minikube start --vm-driver=hyperkit
+-------------------------------------
+- Starts minikube.
+- MINIKUBE has master and worker node on the SAME virtual machine (single-node cluster).
+- MINIKUBE runs inside VirtualBox/Hyperkit on local PC.
+- Minikube is already a VM, so why VirtualBox?
+    → Because minikube needs a "hypervisor" (VirtualBox / HyperKit / Docker) to run its own VM.
+- If Docker is installed:
+    → Minikube can use Docker as the hypervisor (so it can run WITHOUT VirtualBox).
+
+kubectl get nodes
+-----------------
+- Shows all nodes inside the cluster (minikube = 1 node).
+
+kubectl get pod
+----------------
+- Lists all pods running inside the cluster.
+
+kubectl get services
+---------------------
+- Lists services that expose pods or applications.
+
+kubectl create deployment NAME --image=image
+---------------------------------------------
+- To create pods, you do NOT create pods directly.
+- You create a **deployment**, which is an abstraction/blueprint over Pods.
+- This deployment automatically creates the required Pod(s).
+- Minimum info needed:
+    ✔ deployment name  
+    ✔ container image  
+- All other configs use Kubernetes defaults.
+
+kubectl get deployment
+-----------------------
+- Lists all deployments in the cluster.
+
+ReplicaSet (Automatic)
+-----------------------
+- Between Pod and Deployment there is another layer: **ReplicaSet**.
+- ReplicaSet handles the number of pod replicas.
+- You never interact directly with ReplicaSet.
+- Deployment manages ReplicaSet automatically.
+
+kubectl get replicaset
+-----------------------
+- Lists ReplicaSets created by each deployment.
+
+Pod Naming
+-----------
+pod name = deploymentName - replicaSetID - ownID  
+
+Example:
+myapp-5ffc8d77fc-rk29t
+
+kubectl edit deployment <deploymentName>
+-----------------------------------------
+- Used to update deployment configuration (e.g., change image).
+- How it works:
+    → When you edit deployment → Deployment updates ReplicaSet  
+    → ReplicaSet kills old Pods and creates new Pods with updated config  
+
+kubectl logs <podName>
+-----------------------
+- Shows logs of a specific pod.
+
+kubectl describe pod <podName>
+-------------------------------
+- Shows full details: events, status, image, restarts, node name, etc.
+
+kubectl exec -it <podName> -- /bin/bash
+-----------------------------------------
+- Enters the running container shell inside the pod.
+
+kubectl delete deployment <deploymentName>
+------------------------------------------
+- Deletes the deployment → ReplicaSet → and Pods created by it.
+
+kubectl describe service serviceName
+-------------------------------------
+- Shows detailed info of a service
+
+kubectl get pods -o wide
+------------------------
+- Shows pods along with IP, node name, and more details
+
+kubectl get deployment deploymentName -o yaml
+---------------------------------------------
+- Displays YAML configuration of a deployment
+
+kubectl get deployment deploymentName -o yaml > fileName.yaml
+-------------------------------------------------------------
+- Saves deployment YAML definition into a file
+
+kubectl delete -f configurationFileName.yaml
+--------------------------------------------
+- Deletes component based on the configuration file
+
+kubectl get all
+-------------------------------------
+- lists all Kubernetes resources in the current namespace or all components in a cluster
+
+kubectl get secret
+-------------------------------------
+- lists all Kubernetes Secrets in the current namespace
+
+kubectl get namespace
+---------------------
+ Show all namespaces in the cluster
+
+kubectl cluster-info
+--------------------
+# Show basic cluster information
+
+kubectl create namespace <namespace_name>
+-----------------------------------------
+# Create a new namespace
+
+kubectl api-resources --namespaced=false
+----------------------------------------
+# List API resources that are NOT namespaced (cluster-wide resources)
+# Examples of non-namespaced resources:
+#   - nodes
+#   - persistentvolumes
+#   - namespaces
+#   - clusterroles
+#   - storageclasses
+
+kubectl api-resources --namespaced=true
+---------------------------------------
+# List API resources that ARE namespaced
+# Examples of namespaced resources:
+#   - pods
+#   - services
+#   - configmaps
+#   - secrets
+#   - deployments
+
+kubectl get configmap -n <namespace_name>
+-----------------------------------------
+# Get configmaps from a specific namespace
+
+kubectl apply -f config.yaml --namespace=<namespace_name>
+---------------------------------------------------------
+# Apply a configuration file into a specific namespace
+
+minikube addons enable ingress
+------------------------------
+# Enable NGINX Ingress controller in Minikube
+# → Automatically installs & starts the K8s NGINX implementation of the Ingress Controller.
+
+kubectl get ns
+--------------
+# List all namespaces in the cluster
+
+kubectl get ingress -n <namespace_name> --watch
+-----------------------------------------------
+# Watch ingress creation & status updates in a specific namespace
+
+kubectl describe ingress <ingress_name> -n <namespace_name>
+-----------------------------------------------------------
+# Get detailed configuration and routing info of a specific ingress
+
+kubectl apply -f config-file.yaml
+----------------------------------
+- Used to create OR update any Kubernetes object using YAML config file.
+- What is a Kubernetes configuration file?
+    - A YAML file that describes:
+        ✔ pod  
+        ✔ deployment  
+        ✔ service  
+        ✔ configmap  
+        ✔ secret  
+        ✔ ingress  
+        etc.
+- Why use configuration file?
+    - Infrastructure-as-code  
+    - Easier to reproduce, update, version control.
+- How apply works:
+    - If resource doesn't exist → it will be CREATED.
+    - If resource exists → it will be UPDATED to match the YAML file.
+
+=========================================
+
+===========================================
+🚀 KUBERNETES CONFIGURATION FILE 
+===========================================
+
+▶ K8s configuration file
+------------------------
+- Used to create/update Kubernetes objects (Deployment, Pod, Service, etc.)
+- Written in **YAML format**
+- Helps maintain infra as code (repeatable & version controlled)
+- Same file can be applied to:
+  ✔ create first time
+  ✔ update existing component
+
+Run using:
+kubectl apply -f filename.yaml
+
+---------------------------------------------------
+▶ 3 MAIN PARTS OF ANY K8s CONFIGURATION FILE
+---------------------------------------------------
+
+1) metadata
+   - Name of component
+   - Labels, annotations (if needed)
+
+2) specification (spec)
+   - Desired state / configuration
+   - Depends on object type
+     (Deployment spec ≠ Pod spec ≠ Service spec)
+
+3) status
+   - Current state of the cluster element
+   - ***Not written by user***
+   - Automatically filled by Kubernetes
+---------------------------------------------------
+
+▶ SPECIAL FOR DEPLOYMENT
+-------------------------
+- Deployment spec contains a **template**
+- Template has its own:
+  ✔ metadata  
+  ✔ specification
+- Template spec = **blueprint for a Pod**
+  → How Pods created by Deployment will look
+
+---------------------------------------------------
+📌 YAML EXAMPLES FOR EVERY MAJOR K8s COMPONENT
+---------------------------------------------------
+
+1) Pod
+------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: app-container
+      image: nginx
+
+----------------------------------------
+
+2) Deployment
+-------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo
+  template:
+    metadata:
+      labels:
+        app: demo
+    spec:
+      containers:
+        - name: app-container
+          image: nginx
+
+----------------------------------------
+
+3) Service
+----------
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: demo
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP   # LoadBalancer / NodePort / External if needed
+
+
+
+# -------- INTERNAL SERVICE (ClusterIP) --------
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-internal-service
+  labels:
+    app: demo-app
+spec:
+  type: ClusterIP        # internal service - default and also not need to define
+  selector:
+    app: demo-app        # connects to pods with this label
+  ports:
+    - port: 80           # service port
+      targetPort: 8080   # container port
+
+
+# 1️⃣ ClusterIP (Internal Service)
+# Default service type in Kubernetes.
+# Accessible only inside the cluster — NOT reachable from outside.
+# Best for internal communication between pods/services.
+# Example use case: backend services communicating with database.
+
+---
+# -------- EXTERNAL SERVICE (LoadBalancer) --------
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-external-service
+  labels:
+    app: demo-app
+spec:
+  type: LoadBalancer               # external service
+  selector:
+    app: demo-app                  # connects to pods with this label
+  ports:
+    - port: 80                     # public port exposed by LB
+      targetPort: 8080             # container port
+      nodePort: 30080              # must be within 30000–32767 range
+
+
+# 2️⃣ LoadBalancer (External Service)
+# Exposes the service to the internet.
+# Cloud provider creates an External IP.
+# To receive external traffic, NodePort is auto-assigned OR can be manually defined (must be between 30000–32767).
+# Example use case: frontend or public API that must be accessed externally.
+
+----------------------------------------
+
+4) ConfigMap
+------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_URL: "https://google.com"
+  ENV: "DEV"
+
+----------------------------------------
+
+5) Secret
+---------
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+type: Opaque
+data:
+  DB_PASSWORD: cGFzc3dvcmQ=  # Base64 encoded
+
+----------------------------------------
+
+6) Persistent Volume (PV)
+-------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: app-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/storage"
+
+----------------------------------------
+
+7) Persistent Volume Claim (PVC)
+--------------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+----------------------------------------
+
+8) StatefulSet
+--------------
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db-stateful
+spec:
+  serviceName: "db"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+        - name: db-container
+          image: postgres
+          volumeMounts:
+            - name: db-storage
+              mountPath: /var/lib/postgresql
+  volumeClaimTemplates:
+    - metadata:
+        name: db-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+
+# All in one YAML file using --- document separation
+
+# ---------- CONFIGMAP ----------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: journey-config
+data:
+  APPLICATION_MODE: "prod"
+  LOG_LEVEL: "info"
+---
+# ---------- SECRET ----------
+apiVersion: v1
+kind: Secret
+metadata:
+  name: journey-secret
+type: Opaque
+data:
+  DB_PASSWORD: cGFzc3dvcmQ=   # base64 encoded "password"
+  API_KEY: YXBpa2V5MTIz       # base64 encoded "apikey123"
+---
+# ---------- DEPLOYMENT ----------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: journey-service
+  labels:
+    app: journey-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: journey-service
+  template:
+    metadata:
+      labels:
+        app: journey-service
+    spec:
+      containers:
+      - name: journey-container
+        image: journey:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: APPLICATION_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: journey-config
+              key: APPLICATION_MODE
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: journey-config
+              key: LOG_LEVEL
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: journey-secret
+              key: DB_PASSWORD
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: journey-secret
+              key: API_KEY
+---
+# ---------- SERVICE ----------
+apiVersion: v1
+kind: Service
+metadata:
+  name: journey-service
+spec:
+  type: ClusterIP
+  selector:
+    app: journey-service
+  ports:
+  - port: 80
+    targetPort: 8080
+
+----------------------------------------
+
+In Kubernetes labels and label selectors are the glue that connect different components (Deployment → ReplicaSet → Pods, Services → Pods, HPA → Deployment, etc.).
+If labels and selectors don’t match properly, Kubernetes objects cannot discover each other.
+
+What is a label?
+A label is a key-value pair attached to an object (Pod, Deployment, Service, etc.).
+Labels describe the object — they don’t have any meaning on their own until something selects them.
+    labels:
+        app: journey-service
+        env: production
+
+What is a selector?
+A selector queries or filters objects based on their labels.
+    selector:
+        matchLabels:
+            app: journey-service
+This tells Kubernetes:
+“Select all pods having label app=journey-service"
+
+Why are labels and selectoe important?
+Deployment’s selector must exactly match Pod labels; otherwise the Deployment will NOT manage those Pods.
+
+A Service routes traffic to Pods based on labels:
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: journey-service
+spec:
+  selector:
+    app: journey-service   # Service selects Pods with this label
+  ports:
+    - port: 80
+      targetPort: 8080
+
+Pods must have the same label:
+
+metadata:
+  labels:
+    app: journey-service
+
+If labels don’t match → Service will show 0 endpoints.
+Always define labels in template and use selectors referencing those labels.
+
+# ⭐ HELM — Beginner Friendly Notes
+
+## 📌 What is Helm & what problem does it solves?
+Helm = **Package Manager for Kubernetes**
+- It **packages multiple YAML files** into one bundle (called a Helm Chart).
+- Helps **share, reuse, download & deploy** Kubernetes apps easily (public / private repo).
+- Solves problem of **managing many YAML files** for microservices across **different environments (dev / prod / staging)**.
+- Instead of manually applying 20 YAML files → **1 Helm install does everything**.
+
+---
+
+## 📌 Helm Chart
+**Helm Chart = bundle / package of Kubernetes YAML files**
+- We can **create our own chart**, **push to Helm repository**, **download existing charts**.
+- Template engine: same YAML structure but **dynamic values** pulled from values.yaml or via `--set`.
+  Example: different DB URL in dev & prod without rewriting deployment YAML.
+
+### 🏗 Helm Chart folder structure
+mychart/  
+ ├── **Chart.yaml** → meta info (name, version, description)  
+ ├── **values.yaml** → values used in templates  
+ ├── **charts/** → dependent charts (if any)  
+ ├── **templates/** → actual Kubernetes YAML files (Deployment, Service, HPA, Ingress, etc)  
+ └── ...
+
+---
+
+## 📌 Helm Release Management
+🕒 2 versions: Helm 2 & Helm 3
+
+### 🔹 Helm v2
+- Has **Client (helm client)** + **Server (Tiller) inside cluster**
+- `helm install` → client sends YAML to **Tiller**, Tiller creates resources
+- **Tiller stores deployment history**
+  - `helm upgrade chartName` → updates existing deployment (no deletion)
+  - If upgrade is wrong → `helm rollback chartName` works because Tiller saved history
+- ❌ Issue → **Tiller has too much power (full permissions) → security risk**
+
+### 🔹 Helm v3
+- ❌ Tiller removed → **no security risk**
+- Helm is now a **simple binary**
+- Uses Kubernetes **API directly**
+- Release history stored in **Kubernetes secrets** instead of Tiller
+
+---
+
+## 📌 Helm Example Template file
+(values dynamically injected from values.yaml)
+
+```yaml
+# templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    spec:
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          env:
+            - name: DB_URL
+              value: {{ .Values.env.DB_URL }}
+```
+
+```yaml
+# values.yaml
+replicaCount: 2
+image:
+  repository: myrepo/journey-service
+  tag: v1.0.0
+env:
+  DB_URL: mysql://user:pass@mysql:3306/db
+```
+
+### Install using chart
+```
+helm install journey ./mychart
+```
+
+### Override values at deploy time
+
+with other value config file
+helm install journey ./mychart --values=prod-values.yaml
+
+```
+with values directly through commands
+helm install journey ./mychart --set replicaCount=5
+helm install journey ./mychart --set replicaCount=4 --set image.tag=v3
+```
+
+
+---
+
+## 🔥 Helm Commands
+```
+helm version                         # Check Helm version
+helm search hub <name>               # Search charts from Artifact Hub
+helm search repo <name>              # Search charts inside added repos
+helm repo add <repo_name> <url>      # Add repository
+helm repo update                     # Update repo list
+helm install <release> <chart_path>          # Install chart
+helm install <release> <repo/chart>          # Install from repo
+helm upgrade <release> <chart_path>          # Upgrade release
+helm rollback <release> <revision>           # Rollback to previous version
+helm uninstall <release>                     # Delete release
+helm list                                     # List installed releases
+helm template <chart_path>                    # Render manifests locally
+helm get values <release>                     # Get override values of release
+helm show values <repo/chart>                 # Show default values
+```
+
+---
+
+## 💡 Why Helm is very useful in microservices?
+Because:
+- every microservice has **almost same YAML structure**
+- only **values (ports, env values, image tag, replicas) differ**
+→ Helm templates + values.yaml avoids duplication
+
+---
+
+## ⭐ One-line summary
+Helm = **Kubernetes YAML automation tool + templating engine + versioned release manager**, helping teams deploy fast, consistent and safe — across all environments.
+
+
+# -------------------------------------------------------------
+# 📌 KUBERNETES VOLUMES — BEGINNER FRIENDLY NOTE
+# -------------------------------------------------------------
+# What is a Kubernetes Volume?
+# → Persistent storage for Pods (because container local storage is temporary)
+# → Without volumes, data is lost when pod restarts or container crashes
+
+# WHY TO USE?
+# → Preserve important data (logs, DB files, uploads)
+# → Share data between containers in a pod
+# → Keep data safe across restarts, rescheduling, deployments
+
+# Kubernetes Volumes have 3 abstraction levels:
+
+# -------------------------------------------------------------
+# 1️⃣ Persistent Volume (PV)
+# -------------------------------------------------------------
+# • Storage resource in the CLUSTER (not inside a namespace)
+# • PV must be created first unless using a dynamic provisioner
+# • PV points to ACTUAL physical storage (local disk / cloud disk / NFS etc)
+# • Lives OUTSIDE namespaces (shared by entire cluster)
+
+# -------------------------------------------------------------
+# 2️⃣ Persistent Volume Claim (PVC)
+# -------------------------------------------------------------
+# • A request for storage by a Pod
+# • Must exist inside the same namespace as the pod
+# • PVC claims PV based on size & access mode compatibility
+
+# -------------------------------------------------------------
+# 3️⃣ StorageClass (SC)
+# -------------------------------------------------------------
+# • Used when we don’t want to manually create PV
+# • SC dynamically provisions PV using a provisioner
+# • Provisioner = backend storage provider (internal / external)
+#   Examples: kubernetes.io/aws-ebs, kubernetes.io/gce-pd, nfs.csi.k8s.io
+#
+# FLOW:
+#   Pod → uses PVC
+#   PVC → requests storage from SC
+#   SC → dynamically creates PV using provisioner from actual storage backend
+
+# -------------------------------------------------------------
+# 📌 IMPORTANT: ConfigMap and Secret CAN NOT be used for PV or PVC directly
+# (they are NOT storage types)
+# But they can be used INSIDE the POD that mounts the PV
+# Example is provided below.
+
+# -------------------------------------------------------------
+# STORAGECLASS EXAMPLE
+# -------------------------------------------------------------
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner   # no dynamic provisioning (for local example)
+volumeBindingMode: WaitForFirstConsumer
+
+---
+# -------------------------------------------------------------
+# PERSISTENT VOLUME EXAMPLE
+# -------------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  hostPath:                 # Example for local storage
+    path: /mnt/data
+
+---
+# -------------------------------------------------------------
+# PERSISTENT VOLUME CLAIM EXAMPLE
+# -------------------------------------------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-pvc
+  namespace: demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: local-storage
+
+---
+# -------------------------------------------------------------
+# CONFIGMAP + SECRET (Used in Pod, not PV/PVC)
+# -------------------------------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: demo
+data:
+  CONFIG_FILE: "config.json"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+  namespace: demo
+type: Opaque
+stringData:
+  DB_PASSWORD: "superStrongPassword"
+
+---
+# -------------------------------------------------------------
+# POD USING PVC + CONFIGMAP + SECRET
+# -------------------------------------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+  namespace: demo
+spec:
+  containers:
+    - name: app
+      image: nginx
+      volumeMounts:
+        - name: app-storage
+          mountPath: /usr/share/nginx/html    # PV storage
+        - name: config-volume
+          mountPath: /etc/app                 # ConfigMap data
+        - name: secret-volume
+          mountPath: /etc/secret              # Secret data
+  volumes:
+    - name: app-storage
+      persistentVolumeClaim:
+        claimName: app-pvc
+    - name: config-volume
+      configMap:
+        name: app-config
+    - name: secret-volume
+      secret:
+        secretName: app-secret
+
+# -------------------------------------------------------------
+# SUMMARY (REMEMBER)
+# -------------------------------------------------------------
+# PV → provides storage to cluster (no namespace)
+# PVC → claims storage (inside namespace)
+# SC → creates PV dynamically
+# ConfigMap + Secret → CANNOT be used for PV/PVC but CAN be mounted IN POD
+# Pod → uses PVC + ConfigMap + Secret mounted as volumes
+
+=========================
+STATEFULSET IN KUBERNETES
+=========================
+
+• What is StatefulSet?
+  - StatefulSet is a special Kubernetes controller used to manage **stateful applications**.
+  - Similar to Deployment but designed for workloads that **need persistent identity and stable storage**.
+  - Ensures pods are created with order, predictable naming, stable network identity, and persistent storage.
+
+• Why StatefulSet instead of Deployment?
+  - Replicating stateful apps is more difficult than stateless apps.
+  - Stateless app: scale up/down easily, pods are **identical & interchangeable**, created in **random order with random hashes**, scale-down deletes **any random replica**, one service balances traffic to any pod.
+  - Stateful app: **pod replicas are NOT identical**, each pod needs its own identity and data. They **cannot be created/deleted in any order** and **cannot be randomly addressed**.
+
+• Identity concept in StatefulSet
+  - StatefulSet gives each pod a **sticky persistent identity**:
+        <statefulset-name>-0
+        <statefulset-name>-1
+        <statefulset-name>-2
+    - Identity = StatefulSet Name + ordinal number.
+    - Pods are same spec but not interchangeable.
+    - Pod identity persists across **restarts, rescheduling, and recreation**.
+
+• Why does identity matter?
+  - Stateful applications store long-term data that must remain consistent.
+  - Without identity:
+      → writing on one pod and reading from another = inconsistent data.
+  - Stateful systems often involve **Master (primary) + Slave/Worker nodes**.
+      → Only master updates data.
+      → Workers continuously sync and replicate data to stay updated.
+      → When new pod is created, it **clones existing data from previous pod** and keeps syncing over time.
+
+• Persistent storage for StatefulSet
+  - Each stateful pod has **its own dedicated physical storage**.
+  - StatefulSet must use **Persistent Volumes (PV) and Persistent Volume Claims (PVC)**.
+  - PV lifecycle is **not tied to the Pod or StatefulSet lifecycle**.
+    → Pod deleted → storage remains intact.
+    → Pod recreated → **same storage automatically re-attached** because identity remains same.
+  - Example: pod `mysql-0` always attaches to PV for `mysql-0`, even after restart.
+
+• Scaling behavior
+  - Scale-up is **sequential**, not parallel:
+        Pod-0 → Pod-1 → Pod-2
+    Next pod starts **only when previous is fully running**.
+  - Scale-down is also **reverse-sequential**:
+        Pod-2 → Pod-1 → Pod-0
+    Prevents accidental state/data corruption.
+
+• Networking behavior
+  - Each StatefulSet pod gets **its own DNS endpoint** via a headless service.
+    Example DNS:
+        pod-0.mysql.default.svc.cluster.local
+  - Pod IP may change, but **DNS name stays same** → stable network identity.
+
+• Why StatefulSet is NOT ideal for many apps
+  - StatefulSets require:
+      ▪ cloning and synchronizing data between pods
+      ▪ remote + persistent storage setup
+      ▪ backup strategies
+      ▪ careful scale-up/down rules
+  - Therefore stateful applications are **complex to containerize and manage** vs stateless apps.
+
+• When to use StatefulSet
+  - Databases (MySQL, PostgreSQL, MongoDB, Cassandra)
+  - Distributed systems (Kafka, Zookeeper, RabbitMQ, Redis Cluster)
+  - Any app that requires:
+      → persistent storage
+      → stable identity
+      → ordered deployment & scaling
+      → stable hostname
+      → pod-specific configuration
+
+• Summary
+  - Deployment → Stateless apps (simple, fast scaling, no pod identity)
+  - StatefulSet → Stateful apps (persistent identity + storage + order + DNS)
+
+
+k8s service-
+what is service and why need,
+in k8s pod has its own ip address and its ephemeral, service provides stable.static ip address that stays even pod dies, service provides load balancing, lose coupling within cluster and outside cluster
+flow of how request flows from external end to ingress to service to pods and container using ips and ports, how service know which nodes under it by label and selectors
+types of services in k8s-
+1. clusterIp - default type of service
