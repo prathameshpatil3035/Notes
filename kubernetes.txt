@@ -2302,21 +2302,33 @@ STATEFULSET IN KUBERNETES
 # 1️⃣ ClusterIP  (DEFAULT)
 #    • Internal service only (NO direct external access)
 #    • Used for internal communication within cluster
+#    Traffic flow:
+#    🔸 Inside Cluster Only  
+#       Client (Pod) → ClusterIP Service → Target Pods
 #
 # 2️⃣ Headless Service
 #    • Used when clients need POD IPs directly (not service IP)
 #    • Set clusterIP: None → DNS lookup returns list of Pod IPs instead of service IP.
 #    • Used for Stateful apps like MongoDB, Kafka, Redis etc.
+#    Traffic flow:
+#    🔸 Pod-to-Pod direct communication (DNS returns Pod IP list)
+#       Client Pod → DNS lookup for Headless Service → Pod IPs → Target Pod (direct, no Service proxy)
 #
 # 3️⃣ NodePort
 #    • Exposes service externally on each worker-node on a STATIC PORT (30000-32767)
 #    • Browser → NodeIP:NodePort → Service → Pod
 #    • Auto-creates ClusterIP internally.
+#    Traffic flow:
+#    🔸 External → Cluster (via Worker Node static port)
+#       External Client → WorkerNodeIP:NodePort → NodePort Service → ClusterIP Service → Target Pods
 #
 # 4️⃣ LoadBalancer
 #    • Exposes service externally using Cloud Provider Load Balancer
 #    • LB → NodePort → ClusterIP → Pod
 #    • Recommended for production external access.
+#    Traffic flow:
+#    🔸 External (via Cloud Load Balancer)
+#       External Client → Cloud LoadBalancer → WorkerNodeIP:NodePort → NodePort Service → ClusterIP Service → Target Pods
 
 
 ------------------------
