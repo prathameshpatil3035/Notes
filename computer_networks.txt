@@ -28,7 +28,7 @@ Types of Topologies:
 |                   | every other node            | + Failure of one node doesn't stop   |
 |                   |                             | - Expensive & complex                |
 +-------------------+-----------------------------+--------------------------------------+
-| Tree / Hierarchical| Combination of star & bus  | + Scalable                           |
+| Tree/Hierarchical | Combination of star & bus  | + Scalable                           |
 |                   |                             | - Backbone failure affects branches  |
 +-------------------+-----------------------------+--------------------------------------+
 | Hybrid            | Combination of topologies   | + Flexible & scalable                |

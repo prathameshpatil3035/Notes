@@ -1,0 +1,644 @@
+COMPLETE SYSTEM DESIGN (HLD) MASTER INDEX
+1. System Design Fundamentals
+1.1 What is System Design
+
+Definition
+
+Goals of system design
+
+System boundaries
+
+System constraints
+
+Trade-offs
+
+1.2 Types of System Design
+
+High Level Design (HLD)
+
+Low Level Design (LLD)
+
+Object Oriented Design
+
+Infrastructure Design
+
+Data Architecture
+
+Enterprise Architecture
+
+1.3 Requirements Analysis
+Functional Requirements
+
+User actions
+
+Core features
+
+Business logic
+
+Input/Output
+
+Non-Functional Requirements
+
+Scalability
+
+Availability
+
+Reliability
+
+Latency
+
+Throughput
+
+Durability
+
+Security
+
+Maintainability
+
+Observability
+
+Fault tolerance
+
+Cost efficiency
+
+1.4 System Constraints
+
+Hardware constraints
+
+Network constraints
+
+Data constraints
+
+Regulatory constraints
+
+2. Estimation and Capacity Planning
+2.1 Back-of-Envelope Calculations
+Traffic Estimation
+
+Daily active users
+
+Requests per second
+
+Peak traffic
+
+Burst traffic
+
+Storage Estimation
+
+Data per record
+
+Total records
+
+Growth rate
+
+Retention policy
+
+Bandwidth Estimation
+
+Upload traffic
+
+Download traffic
+
+CDN traffic
+
+CPU Estimation
+
+Compute workload
+
+Worker jobs
+
+Processing time
+
+Memory Estimation
+
+Cache sizing
+
+In-memory processing
+
+3. System Architecture Styles
+3.1 Monolithic Architecture
+
+Single codebase
+
+Shared database
+
+Deployment model
+
+Scaling limitations
+
+3.2 Microservices Architecture
+
+Service decomposition
+
+Service independence
+
+Service ownership
+
+API contracts
+
+3.3 Service Oriented Architecture (SOA)
+3.4 Event Driven Architecture
+
+Event producers
+
+Event consumers
+
+Event brokers
+
+3.5 Layered Architecture
+
+Presentation layer
+
+Application layer
+
+Domain layer
+
+Data layer
+
+3.6 Hexagonal Architecture
+3.7 Clean Architecture
+3.8 Serverless Architecture
+4. Networking and Communication
+4.1 Networking Fundamentals
+
+OSI model
+
+TCP/IP model
+
+Network layers
+
+4.2 Internet Protocols
+
+TCP
+
+UDP
+
+HTTP
+
+HTTPS
+
+HTTP/2
+
+HTTP/3
+
+4.3 API Communication
+
+REST APIs
+
+GraphQL
+
+gRPC
+
+WebSockets
+
+4.4 Service Communication Patterns
+
+Synchronous communication
+
+Asynchronous communication
+
+Streaming communication
+
+4.5 DNS System
+
+DNS resolution
+
+DNS caching
+
+Geo DNS
+
+Failover DNS
+
+4.6 Reverse Proxy
+
+Examples include
+Nginx
+HAProxy
+
+5. Load Balancing
+5.1 Types
+
+Layer 4 load balancing
+
+Layer 7 load balancing
+
+5.2 Algorithms
+
+Round robin
+
+Weighted round robin
+
+Least connections
+
+Random
+
+IP hash
+
+Consistent hashing
+
+5.3 Load Balancer Architecture
+
+Edge load balancing
+
+Internal load balancing
+
+Global load balancing
+
+5.4 Health Checks
+
+Active health checks
+
+Passive health checks
+
+6. Caching
+6.1 Why Caching
+
+Reduce latency
+
+Reduce database load
+
+6.2 Cache Layers
+
+Browser cache
+
+CDN cache
+
+Reverse proxy cache
+
+Application cache
+
+Database cache
+
+6.3 Cache Strategies
+
+Cache aside
+
+Write through
+
+Write back
+
+Write around
+
+6.4 Cache Eviction Policies
+
+LRU
+
+LFU
+
+FIFO
+
+TTL
+
+6.5 Cache Problems
+
+Cache stampede
+
+Cache penetration
+
+Cache inconsistency
+
+Common tools:
+
+Redis
+Memcached
+
+7. Databases
+7.1 Relational Databases
+
+Examples:
+
+PostgreSQL
+MySQL
+
+Concepts
+
+ACID properties
+
+Transactions
+
+Isolation levels
+
+Query optimization
+
+Indexing
+
+Primary index
+
+Secondary index
+
+Composite index
+
+Covering index
+
+Index structures
+
+B Tree
+
+Hash index
+
+Bitmap index
+
+7.2 NoSQL Databases
+
+Examples:
+
+MongoDB
+Apache Cassandra
+
+Types
+
+Key value
+
+Document
+
+Column family
+
+Graph
+
+Concepts
+
+Eventual consistency
+
+Tunable consistency
+
+Schema design
+
+8. Data Partitioning
+8.1 Horizontal Partitioning
+8.2 Vertical Partitioning
+8.3 Sharding
+Sharding Strategies
+
+Range sharding
+
+Hash sharding
+
+Directory sharding
+
+Advanced Topics
+
+Rebalancing
+
+Hot partitions
+
+9. Replication
+Replication Models
+
+Master slave
+
+Multi master
+
+Leader follower
+
+Replication Types
+
+Synchronous
+
+Asynchronous
+
+Problems
+
+Replication lag
+
+Split brain
+
+Conflict resolution
+
+10. Distributed Systems
+CAP Theorem
+PACELC Theorem
+Consensus Algorithms
+
+Paxos
+
+Raft
+
+Distributed Coordination
+
+Example tools:
+
+Apache Zookeeper
+etcd
+
+Distributed Locks
+Leader Election
+11. Messaging Systems
+
+Examples:
+
+Apache Kafka
+RabbitMQ
+
+Messaging Models
+
+Queue
+
+Publish subscribe
+
+Event streaming
+
+Delivery Semantics
+
+At most once
+
+At least once
+
+Exactly once
+
+Message Ordering
+
+Partition ordering
+
+Global ordering
+
+12. Scalability
+Vertical Scaling
+Horizontal Scaling
+Stateless Services
+Stateful Services
+Auto Scaling
+13. Storage Systems
+Storage Types
+
+Block storage
+
+File storage
+
+Object storage
+
+Examples:
+
+Amazon Web Services S3
+
+Distributed File Systems
+
+HDFS
+
+GFS
+
+14. Content Delivery
+CDN Architecture
+
+Example:
+
+Cloudflare
+
+Components
+
+Edge nodes
+
+Origin servers
+
+Cache invalidation
+
+15. Search Systems
+
+Example:
+
+Elasticsearch
+
+Search Concepts
+
+Inverted index
+
+Tokenization
+
+Ranking algorithms
+
+Relevance scoring
+
+16. Rate Limiting
+Algorithms
+
+Token bucket
+
+Leaky bucket
+
+Sliding window
+
+Fixed window
+
+17. Security
+Authentication
+
+OAuth
+
+JWT
+
+API keys
+
+Authorization
+
+RBAC
+
+ABAC
+
+Encryption
+
+TLS
+
+Data encryption at rest
+
+Data encryption in transit
+
+18. Observability
+Logging
+Metrics
+Tracing
+
+Tools:
+
+Prometheus
+Grafana
+
+19. Reliability Engineering
+Fault tolerance
+Redundancy
+Retries
+Backoff
+Circuit breaker
+20. Deployment and Infrastructure
+Containers
+
+Example:
+
+Docker
+
+Container orchestration
+
+Example:
+
+Kubernetes
+
+Deployment Strategies
+
+Blue green
+
+Canary
+
+Rolling deployment
+
+21. Data Processing
+Batch Processing
+
+Example:
+
+Apache Spark
+
+Stream Processing
+
+Example:
+
+Apache Flink
+
+22. AI System Design
+LLM architecture
+Embeddings
+Vector databases
+
+Examples:
+
+LangChain
+Pinecone
+
+23. Classical System Design Problems
+
+URL shortener
+
+Twitter timeline
+
+Distributed cache
+
+Chat system
+
+Video streaming
+
+File storage system
+
+Notification system
+
+Payment gateway
+
+Search engine
+
+Ride sharing system
+
+24. Advanced Distributed Systems Topics
+
+Multi region architecture
+
+Disaster recovery
+
+Geo replication
+
+Saga pattern
+
+Event sourcing
+
+CQRS
+
+Circuit breaker pattern
+
+Example library:
+
+Resilience4j

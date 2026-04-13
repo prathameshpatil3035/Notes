@@ -1,0 +1,1347 @@
+# AWS Notes and Cloud Platform Comparison
+
+## Traditional vs Cloud Platform to Host Website
+
+- **Traditional Methods (On-Premises Hosting):**
+  - **Server Cost:** High initial capital expense for hardware; ongoing maintenance costs.
+  - **Scale Up/Down:** Scaling requires manual purchase and installation of hardware; slow and expensive.
+  - **Examples:** Own data centers, dedicated hosting providers.
+  
+- **New Cloud Platforms:**
+  - **Server Cost:** Pay-as-you-go, operational expenses reduce upfront costs.
+  - **Scale Up/Down:** Instant, automated scaling; resources adjust dynamically based on demand.
+  - **Examples:** Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), IBM Cloud, Oracle Cloud.
+
+## What is AWS?
+
+Amazon Web Services (AWS) is a comprehensive cloud computing platform provided by Amazon that offers a vast range of on-demand services including computing power, storage, and databases, enabling businesses to deploy applications globally with high reliability and scalability.
+
+## Use of AWS
+
+- Host websites and applications
+- Data storage and backup
+- Big data processing and analytics
+- Machine learning model deployment
+- Content delivery networks (CDN)
+- Disaster recovery solutions
+
+## Features or Advantages of AWS
+
+- Wide global infrastructure with multiple data centers
+- Pay-as-you-go pricing model
+- High scalability and flexibility
+- Robust security and compliance certifications
+- Vast ecosystem of services and third-party integrations
+- Reliable performance with Service Level Agreements (SLAs)
+
+## 3 Types of AWS Services
+
+| Service Type                           | Description                                                                                                | AWS Examples                                      |
+|----------------------------------------|------------------------------------------------------------------------------------------------------------|---------------------------------------------------|
+| **IaaS (Infrastructure as a Service)** | Provides virtualized computing resources over the internet. Users manage OS, middleware, apps.             | Amazon EC2 (virtual servers), Amazon S3 (storage) |
+| **PaaS (Platform as a Service)**       | Provides platform allowing customers to develop, run, manage applications without managing infrastructure. | AWS Elastic Beanstalk, AWS Lambda                 |
+| **SaaS (Software as a Service)**       | Software hosted in the cloud available to users over the internet.                                         | Amazon Chime (communications), AWS WorkDocs       |
+
+## Types of Cloud Deployment Models
+
+- **Public Cloud:** Services delivered over the internet and shared across organizations (e.g., AWS, Azure, GCP)
+- **Private Cloud:** Exclusive cloud environment for a single organization, often on-premises or hosted privately.
+- **Hybrid Cloud:** Combination of public and private clouds allowing data and applications to be shared between them.
+
+================================================================
+# AWS Regions, Availability Zones, Data Centers, and Local Zones
+================================================================
+
+## AWS Regions
+- AWS Regions are separate geographic areas around the world where AWS deploys data centers.
+- Each region is independent and consists of multiple Availability Zones.
+- Example region codes: `us-east-1` (N. Virginia), `eu-central-1` (Frankfurt), `ap-south-1` (Mumbai).
+
+## Availability Zones (AZs)
+- Availability Zones are isolated, physically separate data centers within a region.
+- Each AZ has independent infrastructure including power, networking, and cooling.
+- AZs are connected by high-speed, low-latency links and offer fault isolation to applications.
+- AZ naming: region code plus a letter, e.g., `us-east-1a`, `us-west-2b`.
+- Use multiple AZs to ensure high availability for applications.
+
+## Data Centers
+- Data centers are the actual physical buildings housing AWS servers and networking hardware.
+- Multiple data centers make up an Availability Zone.
+- Designed with redundant power, security, and network connectivity to ensure continuous operation.
+
+## Local Zones
+- Local Zones bring AWS infrastructure closer to large population centers for ultra-low latency access.
+- They extend a parent AWS Region to the location of end-users.
+- Local Zone codes include region plus location plus an identifier, e.g., `us-west-2-lax-1` (Los Angeles Local Zone).
+- Useful for applications requiring very low latency (media processing, gaming, financial services).
+
+============================
+# AWS EC2 Service
+============================
+
+EC2 INSTANCE
+What it is
+  EC2 stands for Elastic Compute Cloud.
+  EC2 is a virtual server in AWS used to run applications.
+
+Why to use
+  Host websites
+  Run backend services
+  Scalable compute power
+
+Features
+  On-demand, scalable
+  Multiple instance types
+  Integrated with EBS, ELB, ASG, VPC
+
+Types
+  On-Demand
+  Reserved
+  Spot
+  Savings Plan
+
+Region / AZ
+  Created in a specific AZ inside a region
+
+Delete dependency
+  Release Elastic IP
+  Check attached EBS volumes
+  ASG or ELB must not be attached
+
+
+PEM KEY (KEY PAIR)
+What it is
+  Authentication key used to login into EC2 via SSH
+
+Why to use
+  Secure login without password
+
+Features
+  One-time downloadable private key
+  Public key stored in AWS
+
+Operations
+  Create key pair
+  Use during EC2 launch
+  Cannot download again
+
+Region based
+  Yes, region specific
+
+Delete dependency
+  Ensure EC2 using this key is terminated or access replaced
+
+
+USER DATA
+What it is
+  Script executed at EC2 first boot
+
+Why to use
+  Install software automatically
+  Configure server at launch
+
+Features
+  Runs only once by default
+  Supports shell scripts, cloud-init
+
+Operations
+  Add during launch
+  Modify only when instance stopped
+
+Region based
+  No
+
+Dependency
+  None
+
+
+INSTANCE METADATA
+What it is
+  Internal data about EC2 instance
+
+Why to use
+  Get instance ID, IP, region inside EC2
+
+Features
+  Accessible via 169.254.169.254
+  No authentication required
+
+Operations
+  Read-only
+
+Dependency
+  Instance must be running
+
+
+ELASTIC IP
+What it is
+  Static public IP for EC2
+
+Why to use
+  Avoid IP change on restart
+
+Features
+  Can be reassigned
+  Charged if unused
+
+Operations
+  Allocate
+  Associate
+  Disassociate
+  Release
+
+Region based
+  Yes
+
+Delete dependency
+  Must disassociate before release
+
+
+EBS VOLUME
+What it is
+  Block storage for EC2
+
+Why to use
+  Persistent data storage
+
+Types
+  gp3, gp2
+  io1, io2
+  st1
+  sc1
+
+Features
+  AZ specific
+  Can be attached/detached
+
+Operations
+  Create volume
+  Attach to EC2
+  Format filesystem
+  Mount to directory
+  Resize
+
+Region / AZ
+  AZ specific
+
+Delete dependency
+  Detach before deleting
+  Snapshot before delete (optional)
+
+Steps to attach
+  Create volume
+  Attach to EC2
+  Login EC2
+  Format (mkfs)
+  Mount
+
+
+SNAPSHOT
+What it is
+  Backup of EBS volume
+
+Why to use
+  Backup and restore data
+
+Features
+  Incremental
+  Stored in S3 (managed)
+
+Operations
+  Create snapshot
+  Create volume from snapshot
+  Delete snapshot
+
+Region based
+  Region specific
+
+Delete dependency
+  AMI using snapshot must be deleted first
+
+
+AMI
+What it is
+  Template of EC2 (OS + software)
+
+Why to use
+  Launch identical EC2s
+
+Features
+  Used by ASG and Launch Template
+
+Operations
+  Create AMI
+  Launch EC2 from AMI
+  Deregister AMI
+
+Region based
+  Yes
+
+Delete dependency
+  Delete ASG, EC2 using it
+  Delete snapshots linked
+
+
+ELB AND TARGET GROUP
+What it is
+  ELB distributes traffic
+  Target group contains EC2s
+
+Why to use
+  High availability
+  Load distribution
+
+Types of ELB
+  ALB
+  NLB
+  CLB
+
+Features
+  Health checks
+  Auto scaling integration
+
+Operations
+  Create target group
+  Register targets
+  Attach to ELB
+
+Region based
+  Yes
+
+Delete dependency
+  Delete listeners
+  Detach from ASG
+
+
+SECURITY GROUP
+What it is
+  Virtual firewall for EC2
+
+Why to use
+  Control inbound/outbound traffic
+
+Features
+  Stateful
+  Allow rules only
+
+Operations
+  Create
+  Attach to EC2
+  Modify rules
+
+Region based
+  Yes
+
+Delete dependency
+  Must detach from EC2, ELB
+
+
+LAUNCH TEMPLATE
+What it is
+  Blueprint to launch EC2
+
+Why to use
+  Reusable EC2 configuration
+  Required for ASG
+
+Features
+  Versioned
+  Supports AMI, SG, key, userdata
+
+Operations
+  Create template
+  Create versions
+  Attach to ASG
+
+Delete dependency
+  ASG must be deleted first
+
+
+AUTO SCALING GROUP (ASG)
+What it is
+  Automatically manages EC2 count
+
+Why to use
+  High availability
+  Cost optimization
+
+Key concepts
+  Cooldown time
+    Time to wait between scaling actions
+  Health check grace period
+    Time for EC2 to become healthy
+
+Auto scaling methods
+  Scheduled scaling
+    Scale at fixed time
+  Predictive scaling
+    Uses historical data
+  Dynamic scaling
+    Simple scaling
+      Add or remove fixed count
+    Step scaling
+      Scale based on metric ranges
+    Target tracking
+      Maintain target metric value
+
+Configuration steps
+  Create launch template
+  Create ASG
+  Attach target group
+  Configure scaling policy
+  Attach CloudWatch alarm
+
+Region / AZ
+  Region specific
+  Can span multiple AZs
+
+Delete dependency
+  Delete ASG first before launch template
+
+
+VPC
+What it is
+  Private network in AWS
+
+Why to use
+  Network isolation
+
+Features
+  CIDR based
+  Subnets
+  Routing control
+
+Operations
+  Create VPC
+  Create subnets
+  Attach IGW
+  Configure route tables
+
+Region based
+  Yes
+
+Delete dependency
+  Delete subnets, gateways first
+
+
+SUBNET
+What it is
+  Subdivision of VPC
+
+Why to use
+  Separate public/private resources
+
+Features
+  AZ specific
+
+Operations
+  Create subnet
+  Associate route table
+
+Delete dependency
+  Remove EC2s first
+
+
+NETWORK INTERFACE (ENI)
+What it is
+  Virtual network card
+
+Why to use
+  Multiple IPs
+  Network separation
+
+Features
+  Can be detached and attached
+
+Operations
+  Create ENI
+  Attach to EC2
+
+AZ based
+  Yes
+
+Delete dependency
+  Detach before delete
+
+
+PLACEMENT GROUP
+What it is
+  Controls EC2 placement
+
+Why to use
+  Low latency or high availability
+
+Types
+  Cluster
+  Spread
+  Partition
+
+Region based
+  Yes
+
+Delete dependency
+  EC2 must be terminated first
+
+
+CLOUDWATCH
+What it is
+  Monitoring service
+
+Why to use
+  Metrics, logs, alarms
+
+Features
+  EC2 metrics
+  Custom metrics
+
+Operations
+  View metrics
+  Create alarms
+  Create dashboards
+
+Region based
+  Yes
+
+
+CLOUDWATCH ALARM
+What it is
+  Triggers action based on metrics
+
+Why to use
+  Auto scaling
+  Notifications
+
+Operations
+  Create alarm
+  Attach to ASG or SNS
+
+Dependency
+  Metric must exist
+
+
+TAGS
+What it is
+  Key-value metadata
+
+Why to use
+  Cost tracking
+  Resource management
+
+Features
+  Applied to almost all AWS resources
+
+Best practice
+  Name
+  Environment
+  Owner
+  Project
+
+
+FINAL NOTE
+EC2 ecosystem works together
+VPC provides network
+EC2 provides compute
+EBS provides storage
+ELB + ASG provide scalability
+CloudWatch provides monitoring
+Security Group provides security
+
+============================
+# AWS IAM Service
+============================
+
+----------------------------------------------------
+How IAM permission evaluation works (important rule)
+----------------------------------------------------
+
+AWS IAM follows this order:
+Explicit DENY
+Explicit ALLOW
+Default DENY (if nothing matches)
+
+🚨 Explicit DENY always wins, no matter where it comes from.
+
+Group A
+Explicitly DENIES S3 read and write
+
+Group B
+Explicitly ALLOWS S3 read and write
+
+IAM User
+Added to both Group A and Group B
+
+If an IAM user belongs to both an Allow and a Deny group for S3, the Deny always wins and the user cannot read or write.
+
+AWS IAM (Identity and Access Management)
+==========================================================================
+
+IAM is a GLOBAL AWS service (not region-specific)
+Used to control WHO can access AWS and WHAT they can do
+
+--------------------------------------------------------------------------
+
+1) IAM – What & Why
+-------------------
+What:
+IAM allows you to manage identities (users, roles) and permissions (policies)
+to securely control access to AWS services and resources.
+
+Why:
+- Avoid using root user for daily work
+- Apply least privilege access
+- Secure AWS accounts
+- Enable audit, compliance, and cost control
+
+Key Concepts:
+- Authentication: Who you are (login)
+- Authorization: What you can do (permissions)
+
+--------------------------------------------------------------------------
+
+2) IAM Users
+------------
+What:
+An IAM User represents a human or application that needs access to AWS.
+
+Why:
+- Individual access tracking
+- Separate credentials
+- Easy permission management
+
+Types of Access:
+- Console access (username + password)
+- Programmatic access (Access Key + Secret Key)
+
+Steps to Create:
+AWS Console → IAM → Users → Create user
+- Enter username
+- Select access type
+- Attach permissions (policy or group)
+- Enable MFA (recommended)
+
+Best Practice:
+- One user = one person
+- Do not share users
+- No permissions directly if possible (use groups)
+
+--------------------------------------------------------------------------
+
+3) IAM User Groups
+------------------
+What:
+A collection of IAM users with shared permissions.
+
+Why:
+- Easier permission management
+- Centralized access control
+- Scales well
+
+How it Works:
+Permissions are attached to groups
+Users inherit permissions from groups
+
+Steps to Create:
+IAM → User groups → Create group
+- Name group
+- Attach policies
+- Add users
+
+Best Practice:
+- No direct permissions to users
+- Use role-based groups (Admin, Developer, ReadOnly)
+
+--------------------------------------------------------------------------
+
+4) IAM Policies
+---------------
+What:
+A JSON document that defines permissions.
+
+Why:
+- Fine-grained access control
+- Secure resource usage
+
+Policy Types:
+- AWS Managed (created by AWS)
+- Customer Managed (created by you)
+- Inline Policy (attached to one user/group/role)
+
+Policy Structure:
+- Effect: Allow / Deny
+- Action: What operation
+- Resource: On which resource
+- Condition: Optional rules
+
+Important Rule:
+Explicit DENY always overrides ALLOW
+
+Steps to Create Customer Managed Policy:
+IAM → Policies → Create policy → JSON/Visual editor → Review → Create
+
+Best Practice:
+- Use least privilege
+- Prefer customer managed policies for control
+
+--------------------------------------------------------------------------
+
+5) Account Settings – Password Policy
+-------------------------------------
+What:
+Defines rules for IAM user passwords.
+
+Why:
+- Improve security
+- Prevent weak passwords
+
+Configurable Rules:
+- Minimum password length
+- Require uppercase, lowercase, numbers, symbols
+- Password expiry
+- Password reuse prevention
+
+Steps:
+IAM → Account settings → Password policy → Edit
+
+Best Practice:
+- Enforce strong password policy
+- Enable password rotation
+
+--------------------------------------------------------------------------
+
+6) MFA (Multi-Factor Authentication)
+------------------------------------
+What:
+Adds an extra authentication layer (something you have).
+
+Why:
+- Protect against credential compromise
+- Mandatory for root user
+
+Types:
+- Virtual MFA (Google Authenticator, Authy)
+- Hardware MFA
+- U2F Security Key
+
+Where Used:
+- Root user
+- IAM users
+- IAM roles (via session policies)
+
+Steps:
+IAM → Users → Security credentials → Assign MFA device
+
+Best Practice:
+- Enable MFA for root user (mandatory)
+- Enable MFA for privileged IAM users
+
+--------------------------------------------------------------------------
+
+7) Security Credentials (User)
+------------------------------
+Includes:
+- Password (console)
+- Access keys (CLI / SDK)
+- MFA devices
+- SSH keys (CodeCommit)
+
+Why:
+Used to authenticate IAM users.
+
+Important:
+- Access keys are sensitive
+- Never commit to Git
+- Rotate regularly
+
+Steps to Create Access Key:
+IAM → Users → Security credentials → Create access key
+
+--------------------------------------------------------------------------
+
+8) AWS CLI & Access Keys
+------------------------
+What:
+AWS CLI allows command-line interaction with AWS services.
+
+Why:
+- Automation
+- Scripting
+- DevOps workflows
+
+Requires:
+- Access Key ID
+- Secret Access Key
+- Region
+
+Steps:
+1) Install AWS CLI
+2) Run: aws configure
+3) Enter access key, secret key, region
+
+Best Practice:
+- Never use root access key
+- Prefer IAM roles over access keys (EC2/Lambda)
+
+--------------------------------------------------------------------------
+
+9) IAM Roles
+------------
+What:
+An IAM identity with permissions but no long-term credentials.
+
+Why:
+- Secure service-to-service access
+- No access key management
+- Temporary credentials
+
+Common Use Cases:
+- EC2 accessing S3
+- Lambda accessing DynamoDB
+- Cross-account access
+
+Role Components:
+- Trust policy (who can assume role)
+- Permission policy (what role can do)
+
+Steps to Create:
+IAM → Roles → Create role
+- Select trusted entity
+- Attach permissions
+- Assign role to service
+
+Best Practice:
+- Always use roles for AWS services
+- Avoid access keys in EC2/Lambda
+
+--------------------------------------------------------------------------
+
+10) AWS CloudShell
+------------------
+What:
+Browser-based shell with AWS CLI preconfigured.
+
+Why:
+- No local setup required
+- Secure temporary credentials
+- Quick testing
+
+Access:
+AWS Console → CloudShell icon
+
+Features:
+- Pre-installed AWS CLI, Git, Python
+- Uses IAM user permissions
+
+Limitations:
+- Session-based
+- Region-specific environment
+
+--------------------------------------------------------------------------
+
+11) Access Advisor (User & Group)
+---------------------------------
+What:
+Shows which AWS services were actually used.
+
+Why:
+- Identify unused permissions
+- Enforce least privilege
+
+Available For:
+- IAM users
+- IAM roles
+- IAM groups
+
+Steps:
+IAM → Users/Groups → Access Advisor tab
+
+Best Practice:
+- Regularly review
+- Remove unused permissions
+
+--------------------------------------------------------------------------
+
+12) Credential Report
+---------------------
+What:
+Account-wide report of all IAM users’ credentials.
+
+Why:
+- Security audit
+- Compliance
+- Identify stale credentials
+
+Includes:
+- Password age
+- MFA status
+- Access key age
+- Last used time
+
+Steps:
+IAM → Credential report → Download report
+
+Best Practice:
+- Review monthly
+- Rotate old credentials
+- Enforce MFA where missing
+
+--------------------------------------------------------------------------
+
+13) Root User vs IAM User (Important)
+------------------------------------
+Root User:
+- Full access to everything
+- Cannot be restricted
+- Used only for account setup
+
+IAM User:
+- Limited permissions
+- Auditable
+- Daily operations
+
+Best Practice:
+- Lock root user
+- Enable MFA
+- Never use root for daily work
+
+--------------------------------------------------------------------------
+
+IAM Best Practices Summary
+--------------------------
+- Enable MFA for root and admins
+- Use groups instead of direct user permissions
+- Use IAM roles for services
+- Rotate access keys
+- Apply least privilege
+- Monitor via Access Advisor & Credential Report
+- Enforce password policy
+
+--------------------------------------------------------------------------
+
+IAM = Security Backbone of AWS
+Misconfiguration here = Account compromise
+
+================================
+AWS S3 (Simple Storage Service) 
+================================
+
+S3 is a GLOBAL service
+Data is stored at REGION level
+Highly durable, scalable, and cost-effective object storage
+
+------------------------------------------------------------------
+
+1) What is S3
+-------------
+What:
+S3 is an object storage service used to store files like
+images, videos, backups, logs, documents, static websites, etc.
+
+Why:
+- Unlimited storage
+- 99.999999999% durability (11 nines)
+- Highly available
+- Secure and cost efficient
+
+Basic Terms:
+- Bucket → container for objects
+- Object → file (data + metadata)
+- Key → unique name of object
+
+------------------------------------------------------------------
+
+2) Bucket Basics
+----------------
+- Bucket name must be globally unique across AWS
+- Bucket is created in ONE region
+- Objects stay in that region unless replicated
+
+Bucket Naming:
+- lowercase only
+- no spaces
+- unique globally (not account-wise)
+
+Example:
+my-company-images-prod
+
+------------------------------------------------------------------
+
+3) Object & Folder Concept (Important)
+--------------------------------------
+S3 does NOT have real folders.
+
+Folders are just part of object name (key).
+
+Example object name:
+images/2025/jan/photo.png
+
+Reality:
+- Single object
+- No actual folder structure
+
+AWS console only SHOWS folders for convenience.
+
+Why this matters:
+- Permissions
+- Lifecycle rules
+- Performance
+
+------------------------------------------------------------------
+
+4) Object Uniqueness
+--------------------
+Each object is uniquely identified by:
+bucket-name + object-key
+
+Example:
+bucket: my-bucket
+key: images/a.png
+
+You can upload another image with SAME NAME:
+- It overwrites existing object (if versioning disabled)
+- Creates new version (if versioning enabled)
+
+Bucket names are globally unique
+Object names are unique only within bucket
+
+------------------------------------------------------------------
+
+5) S3 Versioning
+----------------
+What:
+Keeps multiple versions of the same object.
+
+States:
+- Enabled
+- Suspended (NOT disabled permanently)
+
+Once enabled:
+- Cannot be fully disabled
+- Only suspended
+
+Why:
+- Protect from accidental delete
+- Protect from overwrite
+- Data recovery
+
+Delete behavior:
+If versioning ENABLED:
+- Delete creates a DELETE MARKER
+- Object appears deleted
+- Older versions still exist
+
+Permanent delete:
+- Must delete specific version ID
+- Only possible manually or via lifecycle
+
+Recycle bin analogy:
+Delete marker = recycle bin
+Version delete = permanent delete
+
+------------------------------------------------------------------
+
+6) S3 Region Scope
+------------------
+- Buckets are region-specific
+- Objects stay in bucket’s region
+- Bucket name uniqueness is GLOBAL
+
+Example:
+Bucket in Mumbai
+Object stored in Mumbai only
+
+Replication needed for other regions
+
+------------------------------------------------------------------
+
+7) Static Website Hosting
+-------------------------
+What:
+Host static websites (HTML, CSS, JS) directly from S3.
+
+Why:
+- Cheap
+- No server
+- Highly scalable
+- Simple hosting
+
+Requirements:
+- Enable static website hosting
+- Public access allowed
+- Bucket policy for public read
+
+Index document:
+- index.html
+
+Error document:
+- error.html
+or redirect to an object
+
+Website endpoint:
+http://bucket-name.s3-website-region.amazonaws.com
+
+------------------------------------------------------------------
+
+8) Static Website – Redirects
+-----------------------------
+Options:
+- Redirect all requests to another bucket
+- Redirect error pages to another object
+- Use prefix-based routing
+
+Example:
+/old-path → /new-path/index.html
+or
+bucket1 → bucket2 website
+
+Used for:
+- Domain migration
+- URL restructuring
+
+------------------------------------------------------------------
+
+9) S3 Transfer Acceleration
+---------------------------
+What:
+Speeds up uploads and downloads for global users.
+
+How:
+User → nearest AWS edge location
+Edge → AWS private backbone
+Data → S3 bucket region
+
+Important:
+- Data is ALWAYS stored in bucket region
+- Edge locations do NOT store objects
+
+Use case:
+Bucket in Mumbai
+User in USA
+
+Cost:
+Extra cost per GB
+
+Endpoint:
+bucketname.s3-accelerate.amazonaws.com
+
+------------------------------------------------------------------
+
+10) Edge Location
+-----------------
+What:
+AWS data centers close to users.
+
+Used by:
+- CloudFront
+- S3 Transfer Acceleration
+- Route 53
+- AWS Shield
+
+Purpose:
+- Reduce latency
+- Faster data transfer
+
+Not used for:
+- EC2
+- RDS
+- Permanent storage
+
+------------------------------------------------------------------
+
+11) S3 Replication (SRR / CRR)
+-----------------------------
+What:
+Automatically copy objects between buckets.
+
+Types:
+SRR (Same Region Replication)
+CRR (Cross Region Replication)
+
+Requirements:
+- Versioning enabled on source and destination
+- IAM role for replication
+
+Why:
+- Disaster recovery
+- Compliance
+- Low latency access
+- Backup
+
+Replication notes:
+- Only new objects replicated
+- Existing objects need manual replication
+
+------------------------------------------------------------------
+
+12) S3 Access Logs
+------------------
+What:
+Logs all requests made to a bucket.
+
+Stored as:
+Log files in another S3 bucket
+
+Includes:
+- Requester
+- Operation
+- Time
+- Status code
+- Object key
+
+Why:
+- Security audit
+- Access monitoring
+- Troubleshooting
+
+Best practice:
+- Never log to same bucket
+- Use separate logging bucket
+
+------------------------------------------------------------------
+
+13) S3 Storage Classes
+---------------------
+Standard:
+- Frequently accessed
+- High performance
+
+Standard-IA:
+- Infrequent access
+- Lower cost
+- Retrieval fee
+
+One Zone-IA:
+- Single AZ
+- Cheaper
+- No AZ redundancy
+
+Glacier Instant:
+- Archive with quick access
+
+Glacier Flexible:
+- Minutes to hours retrieval
+
+Glacier Deep Archive:
+- Cheapest
+- Hours to days retrieval
+
+------------------------------------------------------------------
+
+14) S3 Lifecycle Management
+---------------------------
+What:
+Automatically move or delete objects over time.
+
+Why:
+- Reduce cost
+- Automate storage management
+
+Example:
+- Day 0 → Standard
+- Day 30 → Standard-IA
+- Day 90 → Glacier
+- Day 365 → Delete
+
+Lifecycle rules can be applied:
+- Entire bucket
+- Specific prefix
+- Object tags
+
+------------------------------------------------------------------
+
+15) Intelligent Tiering
+-----------------------
+What:
+Automatically moves objects between access tiers.
+
+Why:
+- No need to predict access pattern
+- Cost optimized
+- No performance impact
+
+Works by:
+- Monitoring access patterns
+- Moving data automatically
+
+Extra:
+Small monitoring fee
+
+Best for:
+- Unknown or changing access patterns
+
+------------------------------------------------------------------
+
+16) S3 CORS (Cross-Origin Resource Sharing)
+-------------------------------------------
+What:
+Allows browser-based access from another domain.
+
+Use case:
+Static website in bucket A
+API or assets in bucket B
+
+Without CORS:
+Browser blocks request
+
+With CORS:
+Bucket allows cross-origin requests
+
+Configured at:
+Bucket → Permissions → CORS
+
+Defines:
+- Allowed origins
+- Allowed methods
+- Allowed headers
+
+------------------------------------------------------------------
+
+17) Pre-Signed URL
+------------------
+What:
+Temporary URL to access private S3 object.
+
+Why:
+- Secure temporary access
+- No need to make object public
+
+Used for:
+- File download links
+- Upload links
+- Sharing private data
+
+Features:
+- Expiry time
+- Limited permissions
+- Generated via SDK or CLI
+
+Example:
+Valid for 10 minutes only
+
+------------------------------------------------------------------
+
+18) S3 Security Basics
+---------------------
+Access control via:
+- Bucket policy
+- IAM policy
+- ACL (legacy, avoid)
+- Pre-signed URL
+
+Encryption:
+- At rest (SSE-S3, SSE-KMS)
+- In transit (HTTPS)
+
+------------------------------------------------------------------
+
+19) Cost Optimization Summary
+-----------------------------
+- Use lifecycle rules
+- Use Intelligent Tiering
+- Avoid unnecessary replication
+- Use correct storage class
+- Enable versioning carefully
+- Monitor access logs
+
+------------------------------------------------------------------
+
+cloudfront, edge location (act like catche, copy and deliver), distribution, invalidation, how tomake ec2/alb accessible from cloudfront via security group,
